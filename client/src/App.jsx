@@ -8,7 +8,7 @@ import "./App.css";
 function App() {
   return (
     <EthProvider>
-      <div id="App" >
+      {/* <div id="App" >
         <div className="container">
           <Intro />
           <hr />
@@ -18,6 +18,9 @@ function App() {
           <hr />
           <Footer />
         </div>
+      </div> */}
+      <div className="bg-red-600">
+        Hello
       </div>
     </EthProvider>
   );
