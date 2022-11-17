@@ -7,11 +7,13 @@ import NoticeWrongNetwork from "./NoticeWrongNetwork";
 function Demo() {
   const { state } = useEth();
   const [value, setValue] = useState("?");
+  const [text, setText] = useState("init");
 
   const demo =
     <>
       <div className="contract-container">
-        <ContractBtns setValue={setValue} />
+        <span className="text-lg text-blue-600">Votre valeur : {text}</span>
+        <ContractBtns setValue={setValue} setText={setText} />
       </div>
     </>;
 
