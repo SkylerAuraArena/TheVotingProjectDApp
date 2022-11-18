@@ -1,4 +1,5 @@
 import { useMainContext } from '../../contexts/MainContext'
+import useEth from "../../contexts/EthContext/useEth";
 import { useRef } from "react"
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -12,12 +13,22 @@ const schema = yup.object({
 const Keyboard = () => {
 
   const { mainContextState } = useMainContext()
+  const { state: { contract, accounts } } = useEth();
   const { register, handleSubmit, formState: { errors } } = useForm({
       resolver: yupResolver(schema)
   })
   const mathsAnwserInputRef = useRef(null)
   const onSubmit = data => handleClick(data.panelInput)
   const { ref, ...rest } = register('panelInput')
+
+  const chooseModeBtnArray = <>
+    <Button title={mainContextState.keyboardBtnTxt.mode.admin.txt} color={mainContextState.keyboardBtnTxt.mode.admin.css} />
+    <Button title={mainContextState.keyboardBtnTxt.mode.voter.txt} color={mainContextState.keyboardBtnTxt.mode.voter.css} />
+  </>
+
+  const adminModeControlBtnArray = mainContextState.keyboardBtnTxt.mainOptions.admin.map((elt, index) => <Button key={index} title={elt.txt} color={elt.css} />)
+  const voterModeControlBtnArray = mainContextState.keyboardBtnTxt.mainOptions.voter.map((elt, index) => <Button key={index} title={elt.txt} color={elt.css} />)
+
 
   const handleClick = (btnTxt) => {
       // if(parentState.target !== null){
@@ -27,6 +38,7 @@ const Keyboard = () => {
       //         setSpanMsg(parentState, parentDispatch, 0)
       //     }  
       // }
+      // accounts[0] === 
   }
 
   return (
@@ -45,8 +57,16 @@ const Keyboard = () => {
       <div className="w-100 flex justify-around items-center flex-col gap-6 cursor-pointer">
         {
           mainContextState.displayKeyboardBtn && <>
-            <Button title={mainContextState.keyboardBtnTxt[0][0]} color={mainContextState.keyboardBtnTxt[0][1]} />
-            <Button title={mainContextState.keyboardBtnTxt[1][0]} color={mainContextState.keyboardBtnTxt[1][1]} />
+            {
+              !mainContextState.mode && chooseModeBtnArray
+            }
+            {
+              mainContextState.mode === "Admin" && adminModeControlBtnArray
+            }
+            {
+              mainContextState.mode === "Voter" && voterModeControlBtnArray
+            }
+            {/* <button className="bg-blue-600 text-white" onClick={e=>handleClick(e)}>Test</button> */}
           </>
         }
       </div>

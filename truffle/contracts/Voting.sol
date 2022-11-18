@@ -91,8 +91,8 @@ contract Voting is Ownable {
     }   
 
     /** 
-     * @dev Calls getProposalsList() function to get the whole proposals list.
-     * @return Proposal the description of the given proposal.
+     * @dev Calls getOneProposal() function to get the one proposal informations.
+     * @return Proposal the whole informations of the given proposal.
      */
     function getOneProposal(uint _id) external onlyVoters view returns (Proposal memory) {
         return proposalsArray[_id];
