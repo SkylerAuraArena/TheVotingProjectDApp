@@ -1,12 +1,12 @@
 import { useRef } from 'react'
-import { useMainContext } from '../../contexts/MainContext';
+import useMainContext from '../../contexts/MainContext/useMainContext';
 import Ledger from '../ledger/ClosedLedger';
 import VotingDevice from '../votingDevice/VotingDevice';
 import css from './Booth.module.css';
 
 const Booth = () => {
 
-    const { handleLedgerBtnClick } = useMainContext()
+    const { enableLedger } = useMainContext()
 
     const curtainRef = useRef(null)
     const frontPanelRef = useRef(null)
@@ -29,12 +29,13 @@ const Booth = () => {
             curtainRef.current.className = "hidden";
             backPanelRef.current.className = "";
             ledgerRef.current.className = "hidden";
+            enableLedger(true);
 
         } else {
             curtainRef.current.className = closedCurtainCss;
             backPanelRef.current.className = "hidden";
             ledgerRef.current.className = "";
-            handleLedgerBtnClick(0);
+            enableLedger(false);
         }
     };
     

@@ -8,7 +8,6 @@ const mode = {
   admin: "Admin",
   voter: "Voter",
 }
-
 const votingScreenTextArray = [
   "Welcome, please connect your ledger",
   "Choose your job",
@@ -18,35 +17,7 @@ const ledgerScreenTextArray = [
   "Connect ?",
   "Connected",
 ]
-// const keyboardBtnTextArray2 = [
-//   [
-//     [mode.admin,"bg-red-500"],
-//     [mode.voter,"bg-emerald-500"],
-//   ],
-//   [
-//     //Admin options
-//     [
-//       ["Get voters addresses list","bg-blue-500"],
-//       ["Register new voter","bg-red-500"],
-//       ["Start proposals registration","bg-red-500"],
-//       ["Get proposals list","bg-blue-500"],
-//       ["End proposals registration","bg-red-500"],
-//       ["Start voting session","bg-red-500"],
-//       ["End voting session","bg-red-500"],
-//       ["Tally votes","bg-amber-400"],
-//     ],
-//     //Voters options
-//     [
-//       ["Get voters' addresses list","bg-blue-500"],
-//       ["Get one voter's vote","bg-slate-400"],
-//       ["Get proposals list","bg-blue-500"],
-//       ["Get proposal informations","bg-blue-500"],
-//       ["Register proposal","bg-red-500"],
-//       ["Vote","bg-amber-400"],
-//       ["Check winner","bg-amber-400"],
-//     ]
-//   ],
-// ]
+
 const keyboardBtnTextArray = {
   mode: {
     admin: {

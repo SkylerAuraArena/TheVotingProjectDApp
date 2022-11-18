@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useMainContext } from '../../contexts/MainContext'
+import useMainContext from '../../contexts/MainContext/useMainContext'
 
 const Screen = () => {
     const { mainContextState } = useMainContext()

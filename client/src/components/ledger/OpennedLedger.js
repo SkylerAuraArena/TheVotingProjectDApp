@@ -1,4 +1,4 @@
-import { useMainContext } from "../../contexts/MainContext"
+import useMainContext from "../../contexts/MainContext/useMainContext"
 
 const OpennedLedger = () => {
 

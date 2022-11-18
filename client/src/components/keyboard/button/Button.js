@@ -1,4 +1,4 @@
-import { useMainContext } from "../../../contexts/MainContext"
+import useMainContext from "../../../contexts/MainContext/useMainContext"
 
 export const Button = ({ title, color, func, setter }) => {
 

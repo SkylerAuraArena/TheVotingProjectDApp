@@ -1,4 +1,4 @@
-import { useMainContext } from '../../contexts/MainContext'
+import useMainContext from '../../contexts/MainContext/useMainContext'
 import useEth from "../../contexts/EthContext/useEth";
 import { useRef } from "react"
 import { useForm } from "react-hook-form";
@@ -42,7 +42,7 @@ const Keyboard = () => {
   }
 
   return (
-    <div className="h-[250px] w-52 bg-white text-black flexJIC flex-col shadow-xl border-8 border-double border-slate-300 text-2xl">
+    <div className="h-[250px] w-52 bg-white text-black flexJIC flex-col shadow-xl border-8 border-double border-slate-300 text-2xl ">
       {
         mainContextState.displayKeyboardForm && <form className="w-full flexJIC flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
           <input role="presentation" autoComplete="off" {...rest} name="mathsAnswerInput" id="mathsAnswerInput" placeholder="Votre réponse ?" className="w-full p-4 text-2xl rounded-3xl outline-none shadow-xl font-semibold text-neutral-400" ref={(e) => {
@@ -54,7 +54,7 @@ const Keyboard = () => {
           </span>
       </form>
       }
-      <div className="w-100 flex justify-around items-center flex-col gap-6 cursor-pointer">
+      <div className="w-100 flex justify-start items-center flex-col py-3 px-4 gap-3 cursor-pointer overflow-y-auto">
         {
           mainContextState.displayKeyboardBtn && <>
             {
