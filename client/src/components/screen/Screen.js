@@ -7,7 +7,6 @@ const Screen = () => {
 
     useEffect(() => {
         screenRef.current.innerText = mainContextState.votingDeviceScreenTxt
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mainContextState.votingDeviceScreenTxt]);
     
 

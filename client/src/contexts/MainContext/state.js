@@ -9,12 +9,17 @@ const mode = {
   voter: "Voter",
 }
 
+const functionsModes = {
+  send: "send",
+  call: "call",
+}
+
 const votingScreenTextArray = {
   init: "Welcome, please connect your ledger",
   chooseMode: "Choose your job",
   welcome: {
-    admin: "Welcome new admin",
-    voter: "Welcome new voter",
+    admin: "Welcome admin",
+    voter: "Welcome voter",
   },
 }
 
@@ -36,33 +41,25 @@ const keyboardBtnTextArray = {
   },
   mainOptions: {
     admin: [
-      {txt: "Get voters addresses list", css:"bg-blue-500"},
-      {txt: "Register new voter", css:"bg-red-500"},
-      {txt: "Start proposals registration", css:"bg-red-500"},
-      {txt: "Get proposals list", css:"bg-blue-500"},
-      {txt: "End proposals registration", css:"bg-red-500"},
-      {txt: "Start voting session", css:"bg-red-500"},
-      {txt: "End voting session", css:"bg-red-500"},
-      {txt: "Tally votes", css:"bg-amber-400"},
+      {txt: "Register new voter", css:"bg-blue-500", func: {mode: functionsModes.send, name: "addVoter"}},
+      {txt: "Start proposals registration", css:"bg-red-500", func: {mode: functionsModes.send, name: "startProposalsRegistering"}},
+      {txt: "End proposals registration", css:"bg-red-500", func: {mode: functionsModes.send, name: "endProposalsRegistering"}},
+      {txt: "Start voting session", css:"bg-red-500", func: {mode: functionsModes.send, name: "startVotingSession"}},
+      {txt: "End voting session", css:"bg-red-500", func: {mode: functionsModes.send, name: "endVotingSession"}},
+      {txt: "Tally votes", css:"bg-amber-400", func: {mode: functionsModes.send, name: "tallyVotes"}},
     ],
     voter: [
-      {txt:"Get voters' addresses list", css:"bg-blue-500"},
-      {txt:"Get one voter's vote", css:"bg-slate-400"},
-      {txt:"Get proposals list", css:"bg-blue-500"},
-      {txt:"Get proposal informations", css:"bg-blue-500"},
-      {txt:"Register proposal", css:"bg-red-500"},
-      {txt:"Vote", css:"bg-amber-400"},
-      {txt:"Check winner", css:"bg-amber-400"},
+      {txt:"Get voters' addresses list", css:"bg-emerald-500", func: {mode: functionsModes.call, name: "getVotersList"}},
+      {txt:"Check voter's registration", css:"bg-blue-500", func: {mode: functionsModes.call, name: "getVoter"}},
+      {txt:"Get one voter's vote", css:"bg-emerald-500", func: {mode: functionsModes.call, name: "getVotersVotes"}},
+      {txt:"Get proposals list", css:"bg-emerald-500", func: {mode: functionsModes.call, name: "getProposalsList"}},
+      {txt:"Get proposal informations", css:"bg-emerald-500", func: {mode: functionsModes.call, name: "getOneProposal"}},
+      {txt:"Register proposal", css:"bg-blue-500", func: {mode: functionsModes.send, name: "addProposal"}},
+      {txt:"Vote", css:"bg-blue-500", func: {mode: functionsModes.send, name: "setVote"}},
+      {txt:"Check winner", css:"bg-amber-400", func: {mode: functionsModes.call, name: "winningProposalID"}},
     ],
   },
 }
-
-// css:'border-blue-500',
-// css:'border-blue-500',
-// css:'border-red-500 text-red-500',
-// css:'border-amber-400 text-amber-500',
-// css:'border-emerald-500 text-emerald-500',
-// css:'border-red-300 bg-red-500 text-white',
 
 const initialState = {
   mode: null,
@@ -73,8 +70,6 @@ const initialState = {
   ledgerScreenTxt: ledgerScreenTextArray.disconnected,
   keyboardBtnTxt: keyboardBtnTextArray,
 };
-
-// const reducer = (state, action) => ({...state, ...action})
 
 const reducer = (state, action) => {
   const { type, data } = action;

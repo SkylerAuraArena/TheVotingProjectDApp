@@ -1,5 +1,5 @@
 import useMainContext from '../../contexts/MainContext/useMainContext'
-import useEth from "../../contexts/EthContext/useEth";
+// import useEth from "../../contexts/EthContext/useEth";
 import { useRef } from "react"
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -13,7 +13,7 @@ const schema = yup.object({
 const Keyboard = () => {
 
   const { mainContextState } = useMainContext()
-  const { state: { contract, accounts } } = useEth();
+  // const { state: { contract, accounts }, } = useEth();
   const { register, handleSubmit, formState: { errors } } = useForm({
       resolver: yupResolver(schema)
   })
@@ -26,8 +26,8 @@ const Keyboard = () => {
     <Button title={mainContextState.keyboardBtnTxt.mode.voter.txt} color={mainContextState.keyboardBtnTxt.mode.voter.css} />
   </>
 
-  const adminModeControlBtnArray = mainContextState.keyboardBtnTxt.mainOptions.admin.map((elt, index) => <Button key={index} title={elt.txt} color={elt.css} />)
-  const voterModeControlBtnArray = mainContextState.keyboardBtnTxt.mainOptions.voter.map((elt, index) => <Button key={index} title={elt.txt} color={elt.css} />)
+  const adminModeControlBtnArray = mainContextState.keyboardBtnTxt.mainOptions.admin.map((elt, index) => <Button key={index} title={elt.txt} color={elt.css} func={elt.func}/>)
+  const voterModeControlBtnArray = mainContextState.keyboardBtnTxt.mainOptions.voter.map((elt, index) => <Button key={index} title={elt.txt} color={elt.css} func={elt.func}/>)
 
 
   const handleClick = (btnTxt) => {
@@ -66,7 +66,6 @@ const Keyboard = () => {
             {
               mainContextState.mode === "Voter" && voterModeControlBtnArray
             }
-            {/* <button className="bg-blue-600 text-white" onClick={e=>handleClick(e)}>Test</button> */}
           </>
         }
       </div>

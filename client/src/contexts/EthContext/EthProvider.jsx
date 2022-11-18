@@ -30,7 +30,6 @@ function EthProvider({ children }) {
   useEffect(() => {
     const tryInit = async () => {
       try {
-        // const artifact = require("../../contracts/SimpleStorage.json");
         const artifact = require("../../contracts/Voting.json");
         init(artifact);
       } catch (err) {
@@ -56,7 +55,7 @@ function EthProvider({ children }) {
   return (
     <EthContext.Provider value={{
       state,
-      dispatch
+      dispatch,
     }}>
       {children}
     </EthContext.Provider>

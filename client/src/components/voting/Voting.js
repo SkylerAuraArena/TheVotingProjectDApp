@@ -11,7 +11,7 @@ function Voting() {
   };
   const changeStatus = async () => {
     const text = await contract.methods.startProposalsRegistering().send({ from: accounts[0] });
-    console.log(text);
+    // console.log(text);
   };
 
   // const setGreet = async e => {
