@@ -5,6 +5,12 @@ import { reducer, actions, mode, votingScreenTextArray, ledgerScreenTextArray, i
 const MainContextProvider = ({ children }) => {
   const [mainContextState, mainContextDispatch] = useReducer(reducer, initialState);
 
+  const resetDAppDisplay = () => {
+    mainContextDispatch({
+      type: actions.reset,
+    });
+  }
+
   const enableLedger = (power = false) => {
     mainContextDispatch({
       type: actions.turnOnLedger,
@@ -15,7 +21,6 @@ const MainContextProvider = ({ children }) => {
   const handleLedgerBtnClick = (btnNum = 0) => {
     if(mainContextState.isLedgerEnabled){
       let displayDashboardKeyboard;
-      let disconnect;
       let newVotingScreenTxt;
       let newLedgerScreenTxt;
       let newLedgerStatus;
@@ -40,31 +45,6 @@ const MainContextProvider = ({ children }) => {
       }
     }
   }
-  // const handleLedgerBtnClick = (btnNum = 0) => {
-  //   if(mainContextState.isLedgerEnabled){
-  //     let displayDashboardKeyboard;
-  //     let disconnect;
-  //     let newVotingScreenTxt;
-  //     let newLedgerScreenTxt;
-  //     displayDashboardKeyboard = btnNum === 1 ? true : false
-  //     if(!mainContextState.mode){
-  //       newVotingScreenTxt = votingScreenTextArray.chooseMode;
-  //       newLedgerScreenTxt = ledgerScreenTextArray.disconnected
-  //     } else {
-  //       newVotingScreenTxt = mainContextState.mode === mode.admin ? votingScreenTextArray.welcome.admin : votingScreenTextArray.welcome.voter;
-  //       newLedgerScreenTxt = ledgerScreenTextArray.connected
-  //     }
-  //     mainContextDispatch({
-  //       type: actions.init,
-  //       data: { 
-  //         votingDeviceScreenTxt: newVotingScreenTxt,
-  //         ledgerScreenTxt: newLedgerScreenTxt,
-  //         displayKeyboardBtn: displayDashboardKeyboard,
-  //         mode: disconnect, 
-  //       }
-  //     });
-  //   }
-  // }
 
   const handleKeyboardBtnClick = (btnTxt = "") => {
     let newTxt = ""
@@ -93,6 +73,7 @@ const MainContextProvider = ({ children }) => {
     () => ({
       mainContextState,
       mainContextDispatch,
+      resetDAppDisplay,
       enableLedger,
       handleLedgerBtnClick,
       handleKeyboardBtnClick,

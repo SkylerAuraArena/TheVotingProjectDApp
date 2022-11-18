@@ -6,7 +6,7 @@ import css from './Booth.module.css';
 
 const Booth = () => {
 
-    const { enableLedger } = useMainContext()
+    const { enableLedger, resetDAppDisplay } = useMainContext()
 
     const curtainRef = useRef(null)
     const frontPanelRef = useRef(null)
@@ -35,7 +35,7 @@ const Booth = () => {
             curtainRef.current.className = closedCurtainCss;
             backPanelRef.current.className = "hidden";
             ledgerRef.current.className = "";
-            enableLedger(false);
+            resetDAppDisplay();
         }
     };
     

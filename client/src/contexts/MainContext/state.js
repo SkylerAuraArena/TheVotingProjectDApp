@@ -1,4 +1,5 @@
 const actions = {
+  reset: "RESET",
   update: "UPDATE",
   turnOnLedger: 'TURNONLEDGER',
 };
@@ -78,6 +79,8 @@ const initialState = {
 const reducer = (state, action) => {
   const { type, data } = action;
   switch (type) {
+    case actions.reset:
+      return { ...state, ...initialState };
     case actions.update:
       return { ...state, ...data };
     case actions.turnOnLedger:
