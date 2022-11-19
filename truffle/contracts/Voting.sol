@@ -81,17 +81,19 @@ contract Voting is Ownable {
 
     /** 
      * @dev Calls getVotersVotes() function to get the proposal id of a voter's vote.
+     * @param _addr the address to check a voter's vote.
      * @return uint indicating the id of the choosen proposal according to the voter's address.
      */
-    function getVotersVotes(address _voterAddress) external view onlyVoters returns (uint) {
+    function getVotersVotes(address _addr) external view onlyVoters returns (uint) {
         require(uint8(workflowStatus) >= 4, "Impossible to check voter's votes since the voting session hasn't started yet.");
-        require(voters[_voterAddress].isRegistered == true, "The provided address doesn't match in the registered voters list.");
-        require(voters[_voterAddress].hasVoted == true, "The provided address hasn't voted yet.");
-        return voters[_voterAddress].votedProposalId;
+        require(voters[_addr].isRegistered == true, "The provided address doesn't match in the registered voters list.");
+        require(voters[_addr].hasVoted == true, "The provided address hasn't voted yet.");
+        return voters[_addr].votedProposalId;
     }   
 
     /** 
      * @dev Calls getOneProposal() function to get the one proposal informations.
+     * @param _id the id to check a proposal's informations.
      * @return Proposal the whole informations of the given proposal.
      */
     function getOneProposal(uint _id) external onlyVoters view returns (Proposal memory) {
@@ -117,6 +119,7 @@ contract Voting is Ownable {
         require(voters[_addr].isRegistered != true, 'Already registered');
     
         voters[_addr].isRegistered = true;
+        votersAddresses.push(_addr);
         emit VoterRegistered(_addr);
     }
 
@@ -147,7 +150,7 @@ contract Voting is Ownable {
      * @param _id the index of the choosen proposal to vote for.
      * Only one vote per voter allowed.
      */
-    function setVote( uint _id) external onlyVoters {
+    function setVote(uint _id) external onlyVoters {
         require(workflowStatus == WorkflowStatus.VotingSessionStarted, "Voting session haven't started yet");
         require(voters[msg.sender].hasVoted != true, 'You have already voted');
         require(_id < proposalsArray.length, 'Proposal not found');
@@ -203,7 +206,7 @@ contract Voting is Ownable {
      * modifier onlyOwner form Openzeppelin's contract indicating the function is only usable with the contract creator's address.
      */
     function endVotingSession() external onlyOwner {
-        require(workflowStatus == WorkflowStatus.VotingSessionStarted, 'Voting session havent started yet');
+        require(workflowStatus == WorkflowStatus.VotingSessionStarted, "Voting session hasn't started yet");
         workflowStatus = WorkflowStatus.VotingSessionEnded;
         emit WorkflowStatusChange(WorkflowStatus.VotingSessionStarted, WorkflowStatus.VotingSessionEnded);
     }

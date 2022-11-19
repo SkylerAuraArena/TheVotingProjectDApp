@@ -9,7 +9,7 @@ const OpennedLedger = () => {
       <div className="flexJIC flex-col h-80 w-14 top-48 left-8
        gap-0 absolute">
         <div className="flexJIC h-48 w-14 py-3 bg-black text-base z-0">
-          <div className="w-3/6 h-5/6 bg-slate-400 [writing-mode:vertical-rl] rotate-180">
+          <div className="w-3/6 h-5/6 bg-slate-400 [writing-mode:vertical-rl] rotate-180 cursor-default">
             { mainContextState.ledgerScreenTxt }
           </div>
         </div>

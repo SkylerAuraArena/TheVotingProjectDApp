@@ -18,6 +18,17 @@ const MainContextProvider = ({ children }) => {
     });
   }
 
+  const displayForm = (display = false, form = null) => {
+    mainContextDispatch({
+      type: actions.update,
+      data: {
+        displayKeyboardBtn: !display,
+        displayKeyboardForm: display,
+        form: form,
+      },
+    });
+  }
+  
   const handleLedgerBtnClick = (btnNum = 0) => {
     if(mainContextState.isLedgerEnabled){
       let displayDashboardKeyboard;
@@ -75,6 +86,7 @@ const MainContextProvider = ({ children }) => {
       mainContextDispatch,
       resetDAppDisplay,
       enableLedger,
+      displayForm,
       handleLedgerBtnClick,
       handleKeyboardBtnClick,
     }),
