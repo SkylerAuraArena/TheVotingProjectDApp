@@ -1,6 +1,6 @@
 import { useMemo, useReducer } from "react"
 import MainContext from "./MainContext";
-import { reducer, actions, mode, votingScreenTextArray, ledgerScreenTextArray, initialState } from "./state";
+import { reducer, actions, profile, votingDeviceStates, votingScreenTextArray, ledgerScreenTextArray, initialState } from "./state";
 
 const MainContextProvider = ({ children }) => {
   const [mainContextState, mainContextDispatch] = useReducer(reducer, initialState);
@@ -18,13 +18,36 @@ const MainContextProvider = ({ children }) => {
     });
   }
 
-  const displayForm = (display = false, form = null) => {
+  const displayForm = (funcName = votingDeviceStates.hub, display = false, form = null) => {
+    let newTxt;
+    let newProfile;
+    let newVotingDeviceState;
+    if(funcName === votingDeviceStates.admin.addVoter){
+        newTxt = votingScreenTextArray.hub.admin.sendAddress;
+        newProfile = profile.admin
+        newVotingDeviceState = votingDeviceStates.admin.addVoter;
+    } else if(funcName === votingDeviceStates.voter.getVoter){
+      newTxt = votingScreenTextArray.hub.voter.getVoter;
+      newProfile = profile.voter
+      newVotingDeviceState = votingDeviceStates.voter.getVoter;
+    } else if(funcName === votingDeviceStates.voter.addProposal){
+      newTxt = votingScreenTextArray.hub.voter.addProposal;
+      newProfile = profile.voter
+      newVotingDeviceState = votingDeviceStates.voter.addProposal;
+    } else if(funcName === votingDeviceStates.voter.setVote){
+      newTxt = votingScreenTextArray.hub.voter.setVote;
+      newProfile = profile.voter
+      newVotingDeviceState = votingDeviceStates.voter.setVote;
+    }
     mainContextDispatch({
       type: actions.update,
       data: {
         displayKeyboardBtn: !display,
         displayKeyboardForm: display,
         form: form,
+        votingDeviceScreenTxt: newTxt,
+        profile: newProfile,
+        currentState: newVotingDeviceState,
       },
     });
   }
@@ -35,7 +58,7 @@ const MainContextProvider = ({ children }) => {
       let newVotingScreenTxt;
       let newLedgerScreenTxt;
       let newLedgerStatus;
-      if(mainContextState.mode){
+      if(mainContextState.profile){
 
       } else {
         if(btnNum === 1){
@@ -58,23 +81,36 @@ const MainContextProvider = ({ children }) => {
   }
 
   const handleKeyboardBtnClick = (btnTxt = "") => {
-    let newTxt = ""
-    let newMode = null
+    let newTxt = "";
+    let newProfile = null;
+    let newVotingDeviceState = votingDeviceStates.hub;
+    console.log(mainContextState.profile);
     if(btnTxt !== ""){
-      if(!mainContextState.mode){
-        if(btnTxt === mode.admin){
-          newTxt = votingScreenTextArray.welcome.admin;
-          newMode = mode.admin
+      if(!mainContextState.profile){
+        if(btnTxt === profile.admin){
+          newTxt = votingScreenTextArray.hub.admin.welcome;
+          newProfile = profile.admin
+          newVotingDeviceState = votingDeviceStates.admin.adminHub;
         } else {
-          newTxt = votingScreenTextArray.welcome.voter;
-          newMode = mode.voter
+          newTxt = votingScreenTextArray.hub.voter.welcome;
+          newProfile = profile.voter
+          newVotingDeviceState = votingDeviceStates.voter.voterHub;
         }
+      } else if(mainContextState.profile === profile.admin){
+        if(btnTxt === "Register new voter"){
+          newTxt = votingScreenTextArray.hub.admin.sendAddress;
+          newProfile = profile.admin
+          newVotingDeviceState = votingDeviceStates.admin.registerVoter;
+        }
+      } else if(mainContextState.profile === profile.voter){
+        
       }
       mainContextDispatch({
         type: actions.update,
         data: { 
           votingDeviceScreenTxt: newTxt,
-          mode: newMode
+          profile: newProfile,
+          currentState: newVotingDeviceState,
         }
       });
     }

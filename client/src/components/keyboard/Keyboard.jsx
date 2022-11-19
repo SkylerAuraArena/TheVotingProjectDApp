@@ -9,8 +9,8 @@ const Keyboard = () => {
   const { mainContextState, displayForm } = useMainContext()
 
   const chooseModeBtnArray = <>
-    <Button title={mainContextState.keyboardBtnTxt.mode.admin.txt} color={mainContextState.keyboardBtnTxt.mode.admin.css} />
-    <Button title={mainContextState.keyboardBtnTxt.mode.voter.txt} color={mainContextState.keyboardBtnTxt.mode.voter.css} />
+    <Button title={mainContextState.keyboardBtnTxt.profile.admin.txt} color={mainContextState.keyboardBtnTxt.profile.admin.css} />
+    <Button title={mainContextState.keyboardBtnTxt.profile.voter.txt} color={mainContextState.keyboardBtnTxt.profile.voter.css} />
   </>
 
   const adminModeControlBtnArray = mainContextState.keyboardBtnTxt.mainOptions.admin.map((elt, index) => {
@@ -18,7 +18,7 @@ const Keyboard = () => {
       const newForm = <div key={index} className="w-full flexJIC flex-col gap-2">
           { (elt.func.name === "addVoter") ? <AddressForm elt={elt} /> : null }
       </div>
-      const newFunc =  () => displayForm(true, newForm);
+      const newFunc =  () => displayForm(elt.func.name, true, newForm);
       return <Button key={index} title={elt.txt} color={elt.css} func={newFunc}/>
     } else {
       return <Button key={index} title={elt.txt} color={elt.css} func={elt.func} arg={null}/>
@@ -32,7 +32,7 @@ const Keyboard = () => {
             (elt.func.name === "getOneProposal" || elt.func.name === "setVote") ? <UintForm elt={elt} /> :
             (elt.func.name === "addProposal") ? <StringForm elt={elt} /> : null }
       </div>
-      const newFunc =  () => displayForm(true, newForm);
+      const newFunc =  () => displayForm(elt.func.name, true, newForm);
       return <Button key={index} title={elt.txt} color={elt.css} func={newFunc}/>
     } else {
       return <Button key={index} title={elt.txt} color={elt.css} func={elt.func} arg={null}/>
@@ -50,13 +50,13 @@ const Keyboard = () => {
         {
           mainContextState.displayKeyboardBtn && <>
             {
-              !mainContextState.mode && chooseModeBtnArray
+              !mainContextState.profile && chooseModeBtnArray
             }
             {
-              mainContextState.mode === "Admin" && adminModeControlBtnArray
+              mainContextState.profile === "Admin" && adminModeControlBtnArray
             }
             {
-              mainContextState.mode === "Voter" && voterModeControlBtnArray
+              mainContextState.profile === "Voter" && voterModeControlBtnArray
             }
           </>
         }

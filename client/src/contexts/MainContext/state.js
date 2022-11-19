@@ -4,7 +4,7 @@ const actions = {
   turnOnLedger: 'TURNONLEDGER',
 };
 
-const mode = {
+const profile = {
   admin: "Admin",
   voter: "Voter",
 }
@@ -14,12 +14,40 @@ const functionsModes = {
   call: "call",
 }
 
+const votingDeviceStates = {
+  hub: "hub",
+  admin: {
+    adminHub: "adminHub",
+    addVoter: "addVoter",
+  },
+  voter: {
+    voterHub: "voterHub",
+    getVoter: "getVoter",
+    addProposal: "addProposal",
+    setVote: "setVote",
+  },
+
+}
+
 const votingScreenTextArray = {
   init: "Welcome, please connect your ledger",
   chooseMode: "Choose your job",
-  welcome: {
-    admin: "Welcome admin",
-    voter: "Welcome voter",
+  hub: {
+    admin: {
+      welcome: "Welcome admin, select one option",
+      sendAddress: "Enter the address you want to register",
+      addressSent: "Voter registered",
+
+    },
+    voter: {
+      welcome: "Welcome voter, select one option",
+      getVoter: "Enter the address you want to check",
+      voterGotten: "The address is/is not a registered voter",
+      addProposal: "Desribre the proposal you wish to register",
+      proposalAdded: "Proposal registration complete",
+      setVote: "Enter the proposal's id you want to vote for",
+      voteSet: "Voted !",
+    },
   },
 }
 
@@ -29,13 +57,13 @@ const ledgerScreenTextArray = {
 }
 
 const keyboardBtnTextArray = {
-  mode: {
+  profile: {
     admin: {
-      txt: mode.admin,
+      txt: profile.admin,
       css: "bg-red-500",
     },
     voter: {
-      txt: mode.voter,
+      txt: profile.voter,
       css: "bg-emerald-500",
     },
   },
@@ -62,7 +90,8 @@ const keyboardBtnTextArray = {
 }
 
 const initialState = {
-  mode: null,
+  profile: null,
+  currentState: votingDeviceStates.hub,
   isLedgerEnabled: false,
   displayKeyboardBtn: false,
   displayKeyboardForm: false,
@@ -88,7 +117,8 @@ const reducer = (state, action) => {
 
 export {
   actions,
-  mode,
+  profile,
+  votingDeviceStates,
   votingScreenTextArray,
   ledgerScreenTextArray,
   keyboardBtnTextArray,
