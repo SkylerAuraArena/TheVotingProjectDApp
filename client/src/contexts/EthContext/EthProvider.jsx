@@ -42,6 +42,7 @@ function EthProvider({ children }) {
 
   useEffect(() => {
     const events = ["chainChanged", "accountsChanged"];
+    // const events = ["chainChanged", "accountsChanged",'VoterRegistered','WorkflowStatusChange', 'ProposalRegistered', 'Voted', 'WinnerElected', 'NoWinnerElected'];
     const handleChange = () => {
       init(state.artifact);
     };

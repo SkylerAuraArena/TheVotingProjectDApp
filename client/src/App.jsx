@@ -6,8 +6,8 @@ import MainContextProvider from "./contexts/MainContext/MainContextProvider";
 
 function App() {
   return (
-    <MainContextProvider>
-        <EthProvider>
+    <EthProvider>
+        <MainContextProvider>
           {/* <div id="App" >
             <div className="container">
               <Demo />
@@ -19,8 +19,8 @@ function App() {
           <div className="w-100 h-screen flexJIC">
             <Booth />
           </div>
-        </EthProvider>
-    </MainContextProvider>
+        </MainContextProvider>
+      </EthProvider>
   );
 }
 

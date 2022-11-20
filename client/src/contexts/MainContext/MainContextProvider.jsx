@@ -1,9 +1,12 @@
-import { useMemo, useReducer } from "react"
+import { useEffect, useMemo, useReducer, useState } from "react"
+import useEth from "../EthContext/useEth";
 import MainContext from "./MainContext";
 import { reducer, actions, profile, votingDeviceStates, votingScreenTextArray, ledgerScreenTextArray, initialState } from "./state";
 
 const MainContextProvider = ({ children }) => {
+  const { state: { contract } } = useEth();
   const [mainContextState, mainContextDispatch] = useReducer(reducer, initialState);
+  const [oldEvents, setOldEvents] = useState();
 
   const resetDAppDisplay = () => {
     mainContextDispatch({
@@ -23,9 +26,9 @@ const MainContextProvider = ({ children }) => {
     let newProfile;
     let newVotingDeviceState;
     if(funcName === votingDeviceStates.admin.addVoter){
-        newTxt = votingScreenTextArray.hub.admin.sendAddress;
-        newProfile = profile.admin
-        newVotingDeviceState = votingDeviceStates.admin.addVoter;
+      newTxt = votingScreenTextArray.hub.admin.sendAddress;
+      newProfile = profile.admin
+      newVotingDeviceState = votingDeviceStates.admin.addVoter;
     } else if(funcName === votingDeviceStates.voter.getVoter){
       newTxt = votingScreenTextArray.hub.voter.getVoter;
       newProfile = profile.voter
@@ -84,7 +87,6 @@ const MainContextProvider = ({ children }) => {
     let newTxt = "";
     let newProfile = null;
     let newVotingDeviceState = votingDeviceStates.hub;
-    console.log(mainContextState.profile);
     if(btnTxt !== ""){
       if(!mainContextState.profile){
         if(btnTxt === profile.admin){
@@ -96,15 +98,7 @@ const MainContextProvider = ({ children }) => {
           newProfile = profile.voter
           newVotingDeviceState = votingDeviceStates.voter.voterHub;
         }
-      } else if(mainContextState.profile === profile.admin){
-        if(btnTxt === "Register new voter"){
-          newTxt = votingScreenTextArray.hub.admin.sendAddress;
-          newProfile = profile.admin
-          newVotingDeviceState = votingDeviceStates.admin.registerVoter;
-        }
-      } else if(mainContextState.profile === profile.voter){
-        
-      }
+      } 
       mainContextDispatch({
         type: actions.update,
         data: { 
@@ -115,6 +109,39 @@ const MainContextProvider = ({ children }) => {
       });
     }
   }
+
+  const updateVotingScreen = (newScreenTxt = "") => {
+    mainContextDispatch({
+      type: actions.update,
+      data: { 
+        votingDeviceScreenTxt: newScreenTxt,
+      }
+    });
+  }
+
+  useEffect(() => {
+    (async function () {
+        // let oldEvents= await contract.getPastEvents('VoterRegistered','WorkflowStatusChange', 'ProposalRegistered', 'Voted', 'WinnerElected', 'NoWinnerElected', {
+        //   fromBlock: 0,
+        //   toBlock: 'latest'
+        // });
+        // let oldies=[];
+        // oldEvents.forEach(event => {
+        //     oldies.push(event.returnValues._val);
+        // });
+        // setOldEvents(oldies);
+
+        await contract?.events?.VoterRegistered({fromBlock:'earliest'})
+        .on('data', event => {
+          let lesevents = event.returnValues._val;
+          updateVotingScreen(lesevents);
+        })          
+        .on('changed', changed => console.log(changed))
+        .on('error', err => console.log(err))
+        .on('connected', str => console.log(str))
+        // console.log(contract.events);
+    })(); 
+  }, [contract])
 
   const contextValues = useMemo(
     () => ({

@@ -37,16 +37,19 @@ const votingScreenTextArray = {
       welcome: "Welcome admin, select one option",
       sendAddress: "Enter the address you want to register",
       addressSent: "Voter registered",
-
+      addressNotSent: "Invalid registration, please try again",
     },
     voter: {
       welcome: "Welcome voter, select one option",
       getVoter: "Enter the address you want to check",
-      voterGotten: "The address is/is not a registered voter",
+      voterGotten: "The address is a registered voter",
+      voterNotGotten: "The address is not a registered voter",
       addProposal: "Desribre the proposal you wish to register",
       proposalAdded: "Proposal registration complete",
+      proposalNotAdded: "Proposal registration failed, please try again",
       setVote: "Enter the proposal's id you want to vote for",
       voteSet: "Voted !",
+      voteNotSet: "Vote failed",
     },
   },
 }
