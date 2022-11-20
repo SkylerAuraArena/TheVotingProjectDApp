@@ -14,6 +14,15 @@ const functionsModes = {
   call: "call",
 }
 
+const eventsList = {
+  voterRegistered: "VoterRegistered",
+  workflowStatusChange: "WorkflowStatusChange",
+  proposalRegistered: "ProposalRegistered",
+  voted: "Voted",
+  winnerElected: "WinnerElected",
+  noWinnerElected: "NoWinnerElected",
+}
+
 const votingDeviceStates = {
   hub: "hub",
   admin: {
@@ -61,6 +70,12 @@ const ledgerScreenTextArray = {
 
 const keyboardBtnTextArray = {
   profile: {
+    global: {
+      back: {
+        txt: "<<",
+        css: "bg-zinc-500",
+      }
+    },
     admin: {
       txt: profile.admin,
       css: "bg-red-500",
@@ -122,6 +137,7 @@ export {
   actions,
   profile,
   votingDeviceStates,
+  eventsList,
   votingScreenTextArray,
   ledgerScreenTextArray,
   keyboardBtnTextArray,

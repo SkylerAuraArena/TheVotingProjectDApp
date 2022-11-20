@@ -1,7 +1,7 @@
 import useEth from "../../../contexts/EthContext/useEth";
 import useMainContext from "../../../contexts/MainContext/useMainContext"
 
-export const Button = ({ title, color, func, arg }) => {
+export const Button = ({ title, color, func, args = false }) => {
 
   const { handleKeyboardBtnClick } = useMainContext()
   const { state: { contract, accounts } } = useEth();
@@ -10,19 +10,21 @@ export const Button = ({ title, color, func, arg }) => {
 
   const handleClick = async e => {
     const txt = e.target.title
-    let returnValue;
-    if(func && !func.params) {
+    // let returnValue;
+    if(func && !args) {
       func();
-    } else if(func && func.params){
+    } else if(func && args){
       if (func.mode === "send") {
-        returnValue = await contract.methods[func.name](arg).send({ from: accounts[0] });
+        // returnValue = await contract.methods[func.name]().send({ from: accounts[0] });
+        await contract.methods[func.name]().send({ from: accounts[0] });
       } else if (func.mode === "call") {
-        returnValue = await contract.methods[func.name](arg).call({ from: accounts[0] });   
+        // returnValue = await contract.methods[func.name]().call({ from: accounts[0] });   
+        await contract.methods[func.name]().call({ from: accounts[0] });   
       }
     } else {
       handleKeyboardBtnClick(txt)
     }
-    returnValue && console.log(returnValue);
+    // returnValue && console.log(returnValue);
   }
 
   return (

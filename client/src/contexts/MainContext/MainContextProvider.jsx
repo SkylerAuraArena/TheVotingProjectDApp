@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useReducer, useState } from "react"
 import useEth from "../EthContext/useEth";
 import MainContext from "./MainContext";
-import { reducer, actions, profile, votingDeviceStates, votingScreenTextArray, ledgerScreenTextArray, initialState } from "./state";
+import { reducer, actions, profile, votingDeviceStates, eventsList, votingScreenTextArray, ledgerScreenTextArray, initialState, keyboardBtnTextArray } from "./state";
+import { formatETHAddress } from "../../helpers/functionsHelpers";
 
 const MainContextProvider = ({ children }) => {
   const { state: { contract } } = useEth();
@@ -87,6 +88,8 @@ const MainContextProvider = ({ children }) => {
     let newTxt = "";
     let newProfile = null;
     let newVotingDeviceState = votingDeviceStates.hub;
+    let displayKeyboardBtn = true;
+    let displayKeyboardForm = false;
     if(btnTxt !== ""){
       if(!mainContextState.profile){
         if(btnTxt === profile.admin){
@@ -98,6 +101,30 @@ const MainContextProvider = ({ children }) => {
           newProfile = profile.voter
           newVotingDeviceState = votingDeviceStates.voter.voterHub;
         }
+      } else {
+        if(btnTxt === keyboardBtnTextArray.profile.global.back.txt){
+          if(mainContextState.currentState === votingDeviceStates.admin.adminHub || mainContextState.currentState === votingDeviceStates.voter.voterHub) {
+            newTxt = votingScreenTextArray.chooseMode;
+            newProfile = null;
+            newVotingDeviceState = votingDeviceStates.hub;
+            displayKeyboardBtn = true;
+            displayKeyboardForm = false;
+          } else {
+            if(mainContextState.profile === profile.admin) {
+              newTxt = votingScreenTextArray.hub.admin.welcome;
+              newProfile = profile.admin;
+              newVotingDeviceState = votingDeviceStates.admin.adminHub;
+              displayKeyboardBtn = true;
+              displayKeyboardForm = false;
+            } else if (mainContextState.profile === profile.voter) {
+              newTxt = votingScreenTextArray.hub.admin.welcome;
+              newProfile = profile.voter;
+              newVotingDeviceState = votingDeviceStates.voter.voterHub;
+              displayKeyboardBtn = true;
+              displayKeyboardForm = false;
+            }
+          }
+        }
       } 
       mainContextDispatch({
         type: actions.update,
@@ -105,6 +132,8 @@ const MainContextProvider = ({ children }) => {
           votingDeviceScreenTxt: newTxt,
           profile: newProfile,
           currentState: newVotingDeviceState,
+          displayKeyboardBtn: displayKeyboardBtn,
+          displayKeyboardForm: displayKeyboardForm,
         }
       });
     }
@@ -121,25 +150,35 @@ const MainContextProvider = ({ children }) => {
 
   useEffect(() => {
     (async function () {
-        // let oldEvents= await contract.getPastEvents('VoterRegistered','WorkflowStatusChange', 'ProposalRegistered', 'Voted', 'WinnerElected', 'NoWinnerElected', {
-        //   fromBlock: 0,
-        //   toBlock: 'latest'
-        // });
-        // let oldies=[];
-        // oldEvents.forEach(event => {
-        //     oldies.push(event.returnValues._val);
-        // });
-        // setOldEvents(oldies);
+      if(contract){
+        let oldEvents= await contract.getPastEvents('VoterRegistered','WorkflowStatusChange', 'ProposalRegistered', 'Voted', 'WinnerElected', 'NoWinnerElected', {
+          fromBlock: 0,
+          toBlock: 'latest'
+        });
+        let oldies=[];
+        oldEvents.forEach(event => {
+            oldies.push({
+              eventType: event.event,
+              eventData: event.returnValues
+            });
+        });
+        setOldEvents(oldies);
 
-        await contract?.events?.VoterRegistered({fromBlock:'earliest'})
+        await contract.events.VoterRegistered({fromBlock:'earliest'})
         .on('data', event => {
-          let lesevents = event.returnValues._val;
-          updateVotingScreen(lesevents);
+          switch (event.event) {
+            case eventsList.voterRegistered:
+              const formattedAddress = formatETHAddress(event.returnValues.voterAddress)
+              updateVotingScreen(`"${formattedAddress}" registration successful`);
+              break;
+            default:
+              break;
+          }
         })          
         .on('changed', changed => console.log(changed))
         .on('error', err => console.log(err))
         .on('connected', str => console.log(str))
-        // console.log(contract.events);
+      }
     })(); 
   }, [contract])
 
@@ -162,4 +201,4 @@ const MainContextProvider = ({ children }) => {
   return <MainContext.Provider value={contextValues}>{children}</MainContext.Provider>
 }
 
-export default MainContextProvider
+export default MainContextProvider;
