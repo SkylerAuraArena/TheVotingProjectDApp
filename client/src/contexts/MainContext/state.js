@@ -23,6 +23,15 @@ const eventsList = {
   noWinnerElected: "NoWinnerElected",
 }
 
+const workflowStatus = {
+  registeringVoters: "registeringVoters", // Indicates who can vote
+  proposalsRegistrationStarted: "proposalsRegistrationStarted", // Indicates when people can submit proposals
+  proposalsRegistrationEnded: "proposalsRegistrationEnded", // Indicates when proposal submission is over
+  votingSessionStarted: "votingSessionStarted", // Indicates when voting campaign is opened
+  votingSessionEnded: "votingSessionEnded", // Indicates when voting campaign is closed
+  votesTallied: "votesTallied", // Indicates when the votes are tallied
+}
+
 const votingDeviceStates = {
   hub: "hub",
   admin: {
@@ -97,7 +106,7 @@ const keyboardBtnTextArray = {
     voter: [
       {txt:"Get voters' addresses list", css:"bg-emerald-500", func: {mode: functionsModes.call, name: "getVotersList", params: false}},
       {txt:"Check voter's registration", css:"bg-blue-500", func: {mode: functionsModes.call, name: "getVoter", params: true}},
-      {txt:"Get one voter's vote", css:"bg-emerald-500", func: {mode: functionsModes.call, name: "getVotersVotes", params: true}},
+      {txt:"Get one voter's vote", css:"bg-blue-500", func: {mode: functionsModes.call, name: "getVotersVotes", params: true}},
       {txt:"Get proposals list", css:"bg-emerald-500", func: {mode: functionsModes.call, name: "getProposalsList", params: false}},
       {txt:"Get proposal informations", css:"bg-emerald-500", func: {mode: functionsModes.call, name: "getOneProposal", params: true}},
       {txt:"Register proposal", css:"bg-blue-500", func: {mode: functionsModes.send, name: "addProposal", params: true}},
@@ -138,6 +147,7 @@ export {
   profile,
   votingDeviceStates,
   eventsList,
+  workflowStatus,
   votingScreenTextArray,
   ledgerScreenTextArray,
   keyboardBtnTextArray,

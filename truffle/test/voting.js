@@ -3,6 +3,7 @@ const { BN, expectRevert, expectEvent } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
  
 contract("Voting", accounts => {
+    const address0 = '0x0000000000000000000000000000000000000000';
     const owner = accounts[0];
     const secondAddress = accounts[1];
     const thirdAddress = accounts[2];
@@ -23,6 +24,7 @@ contract("Voting", accounts => {
 
         it("...should change the current workflow status from 0 to 1 and get the WorkflowStatusChange event", async () => {
             const newStatusEvent = await VotingTestInstance.startProposalsRegistering();
+            // expectEvent(newStatusEvent,"OwnershipTransferred", {previousOwner: address0, newOwner: owner});
             expectEvent(newStatusEvent,"WorkflowStatusChange" ,{previousStatus: new BN(0), newStatus: new BN(1)});
         });   
 

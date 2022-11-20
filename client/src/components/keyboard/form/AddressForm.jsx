@@ -4,6 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import { Button } from "../button/Button";
 import useEth from "../../../contexts/EthContext/useEth";
+import useMainContext from "../../../contexts/MainContext/useMainContext";
 
 const re = new RegExp(/0x[a-fA-F0-9]{40}/);
 
@@ -13,6 +14,7 @@ const schema = yup.object({
 
 const Form = ({ elt }) => {
 
+    const { updateVotingScreen } = useMainContext()
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
     })
@@ -22,11 +24,24 @@ const Form = ({ elt }) => {
     const { state: { contract, accounts } } = useEth();
     
     const handleFormSubmission = async (data) => {
-        !errors.addressInput?.message && await contract.methods[elt.func.name](data.addressInput).send({ from: accounts[0] });
+        let returnValue;
+        if(elt.func.mode === "send"){
+            // !errors.addressInput?.message && await contract.methods[elt.func.name](data.addressInput).send({ from: accounts[0] });
+            returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](data.addressInput).send({ from: accounts[0] });
+        } else {
+            // await contract.methods[elt.func.name](data?.addressInput ?? data.addressInput).call({ from: accounts[0] });   
+            returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](data?.addressInput ?? data.addressInput).call({ from: accounts[0] });   
+            switch (elt.func.name) {
+                case "getVoter":
+                    updateVotingScreen(returnValue[0] ? "This address is registered as a voter" : "This address is not registered as a voter")
+                    break;
+                default:
+                    break;
+            }
+        }
+        returnValue && console.log(returnValue);
         addressInputRef.current.value = "";
         addressInputRef.current.focus();
-        // const returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](data.addressInput).send({ from: accounts[0] });
-        // returnValue && console.log(returnValue);
     }
 
     useEffect(() => {

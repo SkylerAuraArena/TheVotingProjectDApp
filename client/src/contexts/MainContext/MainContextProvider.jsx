@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useState } from "react"
+import { useEffect, useMemo, useReducer } from "react"
 import useEth from "../EthContext/useEth";
 import MainContext from "./MainContext";
 import { reducer, actions, profile, votingDeviceStates, eventsList, votingScreenTextArray, ledgerScreenTextArray, initialState, keyboardBtnTextArray } from "./state";
@@ -7,7 +7,7 @@ import { formatETHAddress } from "../../helpers/functionsHelpers";
 const MainContextProvider = ({ children }) => {
   const { state: { contract } } = useEth();
   const [mainContextState, mainContextDispatch] = useReducer(reducer, initialState);
-  const [oldEvents, setOldEvents] = useState();
+  // const [oldEvents, setOldEvents] = useState();
 
   const resetDAppDisplay = () => {
     mainContextDispatch({
@@ -148,38 +148,73 @@ const MainContextProvider = ({ children }) => {
     });
   }
 
-  useEffect(() => {
-    (async function () {
-      if(contract){
-        let oldEvents= await contract.getPastEvents('VoterRegistered','WorkflowStatusChange', 'ProposalRegistered', 'Voted', 'WinnerElected', 'NoWinnerElected', {
-          fromBlock: 0,
-          toBlock: 'latest'
-        });
-        let oldies=[];
-        oldEvents.forEach(event => {
-            oldies.push({
-              eventType: event.event,
-              eventData: event.returnValues
-            });
-        });
-        setOldEvents(oldies);
+  // let oldEvents= await contract.getPastEvents('VoterRegistered', 'WorkflowStatusChange', 'ProposalRegistered', 'Voted', 'WinnerElected', 'NoWinnerElected', {
+  const voterRegistrationEventCheck = async () => {
+    if(contract){
+      let oldEvents= await contract.getPastEvents(eventsList.voterRegistered, {
+        fromBlock: 0,
+        toBlock: 'latest'
+      });
+      let oldies=[];
+      oldEvents.forEach(event => {
+          oldies.push({
+            eventType: event.event,
+            eventData: event.returnValues
+          });
+      });
+      // setOldEvents(oldies);
 
-        await contract.events.VoterRegistered({fromBlock:'earliest'})
-        .on('data', event => {
-          switch (event.event) {
-            case eventsList.voterRegistered:
-              const formattedAddress = formatETHAddress(event.returnValues.voterAddress)
-              updateVotingScreen(`"${formattedAddress}" registration successful`);
-              break;
-            default:
-              break;
+      await contract.events.VoterRegistered({fromBlock:'earliest'})
+      .on('data', event => {
+          const formattedAddress = formatETHAddress(event.returnValues.voterAddress)
+          updateVotingScreen(`"${formattedAddress}" registration successful`);
+        })          
+      .on('changed', changed => console.log(changed))
+      .on('error', err => console.log(err))
+      .on('connected', str => console.log(str))
+    }
+  }
+  const workflowStatusChangeEventCheck = async () => {
+    if(contract){
+      let oldEvents= await contract.getPastEvents('WorkflowStatusChange', {
+        fromBlock: 0,
+        toBlock: 'latest'
+      });
+      let oldies=[];
+      oldEvents.forEach(event => {
+          oldies.push({
+            eventType: event.event,
+            eventData: event.returnValues
+          });
+      });
+      // setOldEvents(oldies);
+
+      await contract.events.WorkflowStatusChange({fromBlock:'earliest'})
+      .on('data', event => {
+          console.log(event.returnValues);
+          if(event.returnValues[0] === "0" && event.returnValues[1] === "1") {
+              updateVotingScreen(`Voters registration over, proposals registration started`);
+          } else if(event.returnValues[0] === "1" && event.returnValues[1] === "2") {
+              updateVotingScreen(`Proposals registration over`);
+          } else if(event.returnValues[0] === "2" && event.returnValues[1] === "3") {
+              updateVotingScreen(`Voting session started`);
+          } else if(event.returnValues[0] === "3" && event.returnValues[1] === "4") {
+              updateVotingScreen(`Voting session over`);
+          } else if(event.returnValues[0] === "4" && event.returnValues[1] === "5") {
+              updateVotingScreen(`Votes counting started`);
           }
         })          
-        .on('changed', changed => console.log(changed))
-        .on('error', err => console.log(err))
-        .on('connected', str => console.log(str))
-      }
-    })(); 
+      .on('changed', changed => console.log(changed))
+      .on('error', err => console.log(err))
+      .on('connected', str => console.log(str))
+    }
+  }
+
+
+  useEffect(() => {
+    voterRegistrationEventCheck();
+    workflowStatusChangeEventCheck();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract])
 
   const contextValues = useMemo(
@@ -191,6 +226,7 @@ const MainContextProvider = ({ children }) => {
       displayForm,
       handleLedgerBtnClick,
       handleKeyboardBtnClick,
+      updateVotingScreen,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [

@@ -185,7 +185,7 @@ contract Voting is Ownable {
      * modifier onlyOwner form Openzeppelin's contract indicating the function is only usable with the contract creator's address.
      */
     function endProposalsRegistering() external onlyOwner {
-        require(workflowStatus == WorkflowStatus.ProposalsRegistrationStarted, 'Registering proposals havent started yet');
+        require(workflowStatus == WorkflowStatus.ProposalsRegistrationStarted, "Registering proposals has not started yet");
         require(proposalsArray.length >= 1, "Impossible to stop proposals registration because no proposal has been registered yet.");
         workflowStatus = WorkflowStatus.ProposalsRegistrationEnded;
         emit WorkflowStatusChange(WorkflowStatus.ProposalsRegistrationStarted, WorkflowStatus.ProposalsRegistrationEnded);
@@ -206,7 +206,7 @@ contract Voting is Ownable {
      * modifier onlyOwner form Openzeppelin's contract indicating the function is only usable with the contract creator's address.
      */
     function endVotingSession() external onlyOwner {
-        require(workflowStatus == WorkflowStatus.VotingSessionStarted, "Voting session hasn't started yet");
+        require(workflowStatus == WorkflowStatus.VotingSessionStarted, "Voting session has not started yet");
         workflowStatus = WorkflowStatus.VotingSessionEnded;
         emit WorkflowStatusChange(WorkflowStatus.VotingSessionStarted, WorkflowStatus.VotingSessionEnded);
     }

@@ -30,7 +30,6 @@ const Keyboard = () => {
   const voterModeControlBtnArray = mainContextState.keyboardBtnTxt.mainOptions.voter.map((elt, index) => {
     if(elt.func.params) {
       const newForm = <div key={index} className="w-full flex justify-start items-center flex-col">
-          { backBtn }
           { (elt.func.name === "getVoter" || elt.func.name === "getVotersVotes") ? <AddressForm elt={elt} /> : 
           (elt.func.name === "getOneProposal" || elt.func.name === "setVote") ? <UintForm elt={elt} /> :
           (elt.func.name === "addProposal") ? <StringForm elt={elt} /> : null }

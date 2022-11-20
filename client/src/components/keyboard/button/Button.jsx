@@ -10,21 +10,21 @@ export const Button = ({ title, color, func, args = false }) => {
 
   const handleClick = async e => {
     const txt = e.target.title
-    // let returnValue;
+    let returnValue;
     if(func && !args) {
       func();
     } else if(func && args){
       if (func.mode === "send") {
-        // returnValue = await contract.methods[func.name]().send({ from: accounts[0] });
-        await contract.methods[func.name]().send({ from: accounts[0] });
+        returnValue = await contract.methods[func.name]().send({ from: accounts[0] });
+        // await contract.methods[func.name]().send({ from: accounts[0] });
       } else if (func.mode === "call") {
-        // returnValue = await contract.methods[func.name]().call({ from: accounts[0] });   
-        await contract.methods[func.name]().call({ from: accounts[0] });   
+        returnValue = await contract.methods[func.name]().call({ from: accounts[0] });   
+        // await contract.methods[func.name]().call({ from: accounts[0] });   
       }
     } else {
       handleKeyboardBtnClick(txt)
     }
-    // returnValue && console.log(returnValue);
+    returnValue && console.log(returnValue);
   }
 
   return (
