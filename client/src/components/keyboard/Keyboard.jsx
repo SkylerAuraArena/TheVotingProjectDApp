@@ -6,7 +6,7 @@ import UintForm from './form/UintForm';
 
 const Keyboard = () => {
 
-  const { mainContextState, displayForm } = useMainContext()
+  const { mainContextState, workflowStatus, solidityFunctionsList, displayForm } = useMainContext()
 
   const backBtn = <Button title={mainContextState.keyboardBtnTxt.profile.global.back.txt} color={mainContextState.keyboardBtnTxt.profile.global.back.css} />;
 
@@ -15,17 +15,45 @@ const Keyboard = () => {
     <Button title={mainContextState.keyboardBtnTxt.profile.voter.txt} color={mainContextState.keyboardBtnTxt.profile.voter.css} />
   </>
 
-  const adminModeControlBtnArray = mainContextState.keyboardBtnTxt.mainOptions.admin.map((elt, index) => {
-    if(elt.func.params) {
-      const newForm = <div key={index} className="w-full flexJIC flex-col">
-          { (elt.func.name === "addVoter") ? <AddressForm elt={elt} /> : null }
-      </div>
-      const newFunc =  () => displayForm(elt.func.name, true, newForm);
-      return <Button key={index} title={elt.txt} color={elt.css} func={newFunc}/>
-    } else {
-      return <Button key={index} title={elt.txt} color={elt.css} func={elt.func} args={true}/>
+const adminModeControlBtnArray = mainContextState.keyboardBtnTxt.mainOptions.admin.map((elt, index) => {
+  if(elt.func.params) {
+    const newForm = <div key={index} className="w-full flexJIC flex-col">
+        { (elt.func.name === "addVoter") ? <AddressForm elt={elt} /> : null }
+    </div>
+    const newFunc =  () => displayForm(elt.func.name, true, newForm);
+    return mainContextState.currentWorkflowStatus === workflowStatus.registeringVoters ? <Button key={index} title={elt.txt} color={elt.css} func={newFunc}/> : null
+  } else {
+    switch (elt.func.name) {
+      case solidityFunctionsList.admin.startProposalsRegistering:
+        return mainContextState.currentWorkflowStatus === workflowStatus.registeringVoters ? <Button key={index} title={elt.txt} color={elt.css} func={elt.func} args={true}/> : null
+      case solidityFunctionsList.admin.endProposalsRegistering:
+        return mainContextState.currentWorkflowStatus === workflowStatus.proposalsRegistrationStarted ? <Button key={index} title={elt.txt} color={elt.css} func={elt.func} args={true}/> : null
+      case solidityFunctionsList.admin.startVotingSession:
+        return mainContextState.currentWorkflowStatus === workflowStatus.proposalsRegistrationEnded ? <Button key={index} title={elt.txt} color={elt.css} func={elt.func} args={true}/> : null
+      case solidityFunctionsList.admin.endVotingSession:
+        return mainContextState.currentWorkflowStatus === workflowStatus.votingSessionStarted ? <Button key={index} title={elt.txt} color={elt.css} func={elt.func} args={true}/> : null
+      case solidityFunctionsList.admin.tallyVotes:
+        return mainContextState.currentWorkflowStatus === workflowStatus.votingSessionEnded ? <Button key={index} title={elt.txt} color={elt.css} func={elt.func} args={true}/> : null
+      default:
+        return null;
     }
-  })
+  }
+})
+
+
+  // const solidityFunctionsList = {
+
+  //   voter: {
+  //     getVotersList: "getVotersList",
+  //     getVoter: "getVoter",
+  //     getVotersVotes: "getVotersVotes",
+  //     getProposalsList: "getProposalsList",
+  //     getOneProposal: "getOneProposal",
+  //     addProposal: "addProposal",
+  //     setVote: "setVote",
+  //     winningProposalID: "winningProposalID",
+  //   }
+  // }
 
   const voterModeControlBtnArray = mainContextState.keyboardBtnTxt.mainOptions.voter.map((elt, index) => {
     if(elt.func.params) {

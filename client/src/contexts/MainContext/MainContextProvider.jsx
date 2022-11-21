@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useReducer } from "react"
 import useEth from "../EthContext/useEth";
 import MainContext from "./MainContext";
-import { reducer, actions, profile, votingDeviceStates, eventsList, votingScreenTextArray, ledgerScreenTextArray, initialState, keyboardBtnTextArray } from "./state";
+import { reducer, actions, profiles, votingDeviceStates, eventsList, workflowStatus, solidityFunctionsList, votingScreenTextArray, ledgerScreenTextArray, initialState, keyboardBtnTextArray } from "./state";
 import { formatETHAddress } from "../../helpers/functionsHelpers";
 
 const MainContextProvider = ({ children }) => {
@@ -28,19 +28,19 @@ const MainContextProvider = ({ children }) => {
     let newVotingDeviceState;
     if(funcName === votingDeviceStates.admin.addVoter){
       newTxt = votingScreenTextArray.hub.admin.sendAddress;
-      newProfile = profile.admin
+      newProfile = profiles.admin
       newVotingDeviceState = votingDeviceStates.admin.addVoter;
     } else if(funcName === votingDeviceStates.voter.getVoter){
       newTxt = votingScreenTextArray.hub.voter.getVoter;
-      newProfile = profile.voter
+      newProfile = profiles.voter
       newVotingDeviceState = votingDeviceStates.voter.getVoter;
     } else if(funcName === votingDeviceStates.voter.addProposal){
       newTxt = votingScreenTextArray.hub.voter.addProposal;
-      newProfile = profile.voter
+      newProfile = profiles.voter
       newVotingDeviceState = votingDeviceStates.voter.addProposal;
     } else if(funcName === votingDeviceStates.voter.setVote){
       newTxt = votingScreenTextArray.hub.voter.setVote;
-      newProfile = profile.voter
+      newProfile = profiles.voter
       newVotingDeviceState = votingDeviceStates.voter.setVote;
     }
     mainContextDispatch({
@@ -92,13 +92,13 @@ const MainContextProvider = ({ children }) => {
     let displayKeyboardForm = false;
     if(btnTxt !== ""){
       if(!mainContextState.profile){
-        if(btnTxt === profile.admin){
+        if(btnTxt === profiles.admin){
           newTxt = votingScreenTextArray.hub.admin.welcome;
-          newProfile = profile.admin
+          newProfile = profiles.admin
           newVotingDeviceState = votingDeviceStates.admin.adminHub;
         } else {
           newTxt = votingScreenTextArray.hub.voter.welcome;
-          newProfile = profile.voter
+          newProfile = profiles.voter
           newVotingDeviceState = votingDeviceStates.voter.voterHub;
         }
       } else {
@@ -110,15 +110,15 @@ const MainContextProvider = ({ children }) => {
             displayKeyboardBtn = true;
             displayKeyboardForm = false;
           } else {
-            if(mainContextState.profile === profile.admin) {
+            if(mainContextState.profile === profiles.admin) {
               newTxt = votingScreenTextArray.hub.admin.welcome;
-              newProfile = profile.admin;
+              newProfile = profiles.admin;
               newVotingDeviceState = votingDeviceStates.admin.adminHub;
               displayKeyboardBtn = true;
               displayKeyboardForm = false;
-            } else if (mainContextState.profile === profile.voter) {
+            } else if (mainContextState.profile === profiles.voter) {
               newTxt = votingScreenTextArray.hub.admin.welcome;
-              newProfile = profile.voter;
+              newProfile = profiles.voter;
               newVotingDeviceState = votingDeviceStates.voter.voterHub;
               displayKeyboardBtn = true;
               displayKeyboardForm = false;
@@ -192,24 +192,35 @@ const MainContextProvider = ({ children }) => {
       await contract.events.WorkflowStatusChange({fromBlock:'earliest'})
       .on('data', event => {
           console.log(event.returnValues);
+          let newWorkflowStatus;
           if(event.returnValues[0] === "0" && event.returnValues[1] === "1") {
+              newWorkflowStatus = workflowStatus.proposalsRegistrationStarted;
               updateVotingScreen(`Voters registration over, proposals registration started`);
           } else if(event.returnValues[0] === "1" && event.returnValues[1] === "2") {
+              newWorkflowStatus = workflowStatus.proposalsRegistrationEnded;
               updateVotingScreen(`Proposals registration over`);
           } else if(event.returnValues[0] === "2" && event.returnValues[1] === "3") {
+              newWorkflowStatus = workflowStatus.votingSessionStarted;
               updateVotingScreen(`Voting session started`);
           } else if(event.returnValues[0] === "3" && event.returnValues[1] === "4") {
+              newWorkflowStatus = workflowStatus.votingSessionEnded;
               updateVotingScreen(`Voting session over`);
           } else if(event.returnValues[0] === "4" && event.returnValues[1] === "5") {
+              newWorkflowStatus = workflowStatus.votesTallied;
               updateVotingScreen(`Votes counting started`);
           }
-        })          
+          mainContextDispatch({
+            type: actions.update,
+            data: {
+              currentWorkflowStatus: newWorkflowStatus,
+            },
+        }) 
+      })       
       .on('changed', changed => console.log(changed))
       .on('error', err => console.log(err))
       .on('connected', str => console.log(str))
     }
   }
-
 
   useEffect(() => {
     voterRegistrationEventCheck();
@@ -221,6 +232,9 @@ const MainContextProvider = ({ children }) => {
     () => ({
       mainContextState,
       mainContextDispatch,
+      solidityFunctionsList,
+      profiles,
+      workflowStatus,
       resetDAppDisplay,
       enableLedger,
       displayForm,

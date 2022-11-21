@@ -9,7 +9,7 @@ import useMainContext from "../../../contexts/MainContext/useMainContext";
 const re = new RegExp(/0x[a-fA-F0-9]{40}/);
 
 const schema = yup.object({
-    addressInput: yup.string("You must provide a string formatted as an address").matches(re,"Invalid address, need an 0x format").length(42,"The provided address is too long").required("An address is required"),
+    addressInput: yup.string("You must provide a string formatted as an address").length(42,"The provided address's length must be 42 caracters.").matches(re,"Invalid address, need an 0x format").required("An address is required"),
   }).required()
 
 const Form = ({ elt }) => {
@@ -25,21 +25,25 @@ const Form = ({ elt }) => {
     
     const handleFormSubmission = async (data) => {
         let returnValue;
-        if(elt.func.mode === "send"){
-            // !errors.addressInput?.message && await contract.methods[elt.func.name](data.addressInput).send({ from: accounts[0] });
-            returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](data.addressInput).send({ from: accounts[0] });
-        } else {
-            // await contract.methods[elt.func.name](data?.addressInput ?? data.addressInput).call({ from: accounts[0] });   
-            returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](data?.addressInput ?? data.addressInput).call({ from: accounts[0] });   
-            switch (elt.func.name) {
-                case "getVoter":
-                    updateVotingScreen(returnValue[0] ? "This address is registered as a voter" : "This address is not registered as a voter")
-                    break;
-                default:
-                    break;
+        try {
+            if(elt.func.mode === "send"){
+                // !errors.addressInput?.message && await contract.methods[elt.func.name](data.addressInput).send({ from: accounts[0] });
+                returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](data.addressInput).send({ from: accounts[0] });
+            } else {
+                // await contract.methods[elt.func.name](data?.addressInput ?? data.addressInput).call({ from: accounts[0] });   
+                returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](data?.addressInput ?? data.addressInput).call({ from: accounts[0] });   
+                switch (elt.func.name) {
+                    case "getVoter":
+                        updateVotingScreen(returnValue[0] ? "This address is registered as a voter" : "This address is not registered as a voter")
+                        break;
+                    default:
+                        break;
+                }
             }
+            returnValue && console.log(returnValue);   
+        } catch (error) {
+            updateVotingScreen("Invalid address or voter already registered");
         }
-        returnValue && console.log(returnValue);
         addressInputRef.current.value = "";
         addressInputRef.current.focus();
     }
@@ -58,7 +62,7 @@ const Form = ({ elt }) => {
             </form>
             {
                 errors.addressInput?.message && <>
-                    <span className="w-36 h-12 mb-2 flex justify-start items-center">
+                    <span className="w-36 h-12 mt-4 mb-6 flex justify-start items-center">
                         <p className="w-full text-sm text-red-500">{errors.addressInput?.message && errors.addressInput?.message}</p>
                     </span>
                 </>

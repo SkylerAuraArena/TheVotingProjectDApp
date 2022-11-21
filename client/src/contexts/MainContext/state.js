@@ -4,7 +4,7 @@ const actions = {
   turnOnLedger: 'TURNONLEDGER',
 };
 
-const profile = {
+const profiles = {
   admin: "Admin",
   voter: "Voter",
 }
@@ -21,6 +21,27 @@ const eventsList = {
   voted: "Voted",
   winnerElected: "WinnerElected",
   noWinnerElected: "NoWinnerElected",
+}
+
+const solidityFunctionsList = {
+  admin: {
+    addVoter: "addVoter",
+    startProposalsRegistering: "startProposalsRegistering",
+    endProposalsRegistering: "endProposalsRegistering",
+    startVotingSession: "startVotingSession",
+    endVotingSession: "endVotingSession",
+    tallyVotes: "tallyVotes",
+  },
+  voter: {
+    getVotersList: "getVotersList",
+    getVoter: "getVoter",
+    getVotersVotes: "getVotersVotes",
+    getProposalsList: "getProposalsList",
+    getOneProposal: "getOneProposal",
+    addProposal: "addProposal",
+    setVote: "setVote",
+    winningProposalID: "winningProposalID",
+  }
 }
 
 const workflowStatus = {
@@ -86,32 +107,32 @@ const keyboardBtnTextArray = {
       }
     },
     admin: {
-      txt: profile.admin,
+      txt: profiles.admin,
       css: "bg-red-500",
     },
     voter: {
-      txt: profile.voter,
+      txt: profiles.voter,
       css: "bg-emerald-500",
     },
   },
   mainOptions: {
     admin: [
-      {txt: "Register new voter", css:"bg-blue-500", func: {mode: functionsModes.send, name: "addVoter", params: true}},
-      {txt: "Start proposals registration", css:"bg-red-500", func: {mode: functionsModes.send, name: "startProposalsRegistering", params: false}},
-      {txt: "End proposals registration", css:"bg-red-500", func: {mode: functionsModes.send, name: "endProposalsRegistering", params: false}},
-      {txt: "Start voting session", css:"bg-red-500", func: {mode: functionsModes.send, name: "startVotingSession", params: false}},
-      {txt: "End voting session", css:"bg-red-500", func: {mode: functionsModes.send, name: "endVotingSession", params: false}},
-      {txt: "Tally votes", css:"bg-amber-400", func: {mode: functionsModes.send, name: "tallyVotes", params: false}},
+      {txt: "Register new voter", css:"bg-blue-500", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.addVoter, params: true}},
+      {txt: "Start proposals registration", css:"bg-red-500", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.startProposalsRegistering, params: false}},
+      {txt: "End proposals registration", css:"bg-red-500", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.endProposalsRegistering, params: false}},
+      {txt: "Start voting session", css:"bg-red-500", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.startVotingSession, params: false}},
+      {txt: "End voting session", css:"bg-red-500", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.endVotingSession, params: false}},
+      {txt: "Tally votes", css:"bg-amber-400", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.tallyVotes, params: false}},
     ],
     voter: [
-      {txt:"Get voters' addresses list", css:"bg-emerald-500", func: {mode: functionsModes.call, name: "getVotersList", params: false}},
-      {txt:"Check voter's registration", css:"bg-blue-500", func: {mode: functionsModes.call, name: "getVoter", params: true}},
-      {txt:"Get one voter's vote", css:"bg-blue-500", func: {mode: functionsModes.call, name: "getVotersVotes", params: true}},
-      {txt:"Get proposals list", css:"bg-emerald-500", func: {mode: functionsModes.call, name: "getProposalsList", params: false}},
-      {txt:"Get proposal informations", css:"bg-emerald-500", func: {mode: functionsModes.call, name: "getOneProposal", params: true}},
-      {txt:"Register proposal", css:"bg-blue-500", func: {mode: functionsModes.send, name: "addProposal", params: true}},
-      {txt:"Vote", css:"bg-blue-500", func: {mode: functionsModes.send, name: "setVote", params: true}},
-      {txt:"Check winner", css:"bg-amber-400", func: {mode: functionsModes.call, name: "winningProposalID", params: false}},
+      {txt:"Get voters' addresses list", css:"bg-emerald-500", func: {mode: functionsModes.call, name: solidityFunctionsList.voter.getVotersList, params: false}},
+      {txt:"Check voter's registration", css:"bg-blue-500", func: {mode: functionsModes.call, name: solidityFunctionsList.voter.getVoter, params: true}},
+      {txt:"Get one voter's vote", css:"bg-blue-500", func: {mode: functionsModes.call, name: solidityFunctionsList.voter.getVotersVotes, params: true}},
+      {txt:"Get proposals list", css:"bg-emerald-500", func: {mode: functionsModes.call, name: solidityFunctionsList.voter.getProposalsList, params: false}},
+      {txt:"Get proposal informations", css:"bg-emerald-500", func: {mode: functionsModes.call, name: solidityFunctionsList.voter.getOneProposal, params: true}},
+      {txt:"Register proposal", css:"bg-blue-500", func: {mode: functionsModes.send, name: solidityFunctionsList.voter.addProposal, params: true}},
+      {txt:"Vote", css:"bg-blue-500", func: {mode: functionsModes.send, name: solidityFunctionsList.voter.setVote, params: true}},
+      {txt:"Check winner", css:"bg-amber-400", func: {mode: functionsModes.call, name: solidityFunctionsList.voter.winningProposalID, params: false}},
     ],
   },
 }
@@ -119,6 +140,7 @@ const keyboardBtnTextArray = {
 const initialState = {
   profile: null,
   currentState: votingDeviceStates.hub,
+  currentWorkflowStatus: workflowStatus.registeringVoters,
   isLedgerEnabled: false,
   displayKeyboardBtn: false,
   displayKeyboardForm: false,
@@ -144,9 +166,10 @@ const reducer = (state, action) => {
 
 export {
   actions,
-  profile,
+  profiles,
   votingDeviceStates,
   eventsList,
+  solidityFunctionsList,
   workflowStatus,
   votingScreenTextArray,
   ledgerScreenTextArray,
