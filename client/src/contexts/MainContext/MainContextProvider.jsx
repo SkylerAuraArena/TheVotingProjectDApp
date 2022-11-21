@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useReducer } from "react"
 import useEth from "../EthContext/useEth";
 import MainContext from "./MainContext";
-import { reducer, actions, profiles, votingDeviceStates, eventsList, workflowStatus, solidityFunctionsList, votingScreenTextArray, ledgerScreenTextArray, initialState, keyboardBtnTextArray } from "./state";
+import { reducer, actions, profiles, votingDeviceStates, workflowStatus, solidityFunctionsList, votingScreenTextArray, ledgerScreenTextArray, initialState, keyboardBtnTextArray } from "./state";
 import { formatETHAddress } from "../../helpers/functionsHelpers";
 
 const MainContextProvider = ({ children }) => {
-  const { state: { contract } } = useEth();
+  const { state: { contract, accounts } } = useEth();
   const [mainContextState, mainContextDispatch] = useReducer(reducer, initialState);
-  // const [oldEvents, setOldEvents] = useState();
 
   const resetDAppDisplay = () => {
     mainContextDispatch({
@@ -26,6 +25,7 @@ const MainContextProvider = ({ children }) => {
     let newTxt;
     let newProfile;
     let newVotingDeviceState;
+    let newLedgerScreenTxt = ledgerScreenTextArray.null;
     if(funcName === votingDeviceStates.admin.addVoter){
       newTxt = votingScreenTextArray.hub.admin.sendAddress;
       newProfile = profiles.admin
@@ -48,6 +48,7 @@ const MainContextProvider = ({ children }) => {
       data: {
         displayKeyboardBtn: !display,
         displayKeyboardForm: display,
+        ledgerScreenTxt: newLedgerScreenTxt,
         form: form,
         votingDeviceScreenTxt: newTxt,
         profile: newProfile,
@@ -63,7 +64,8 @@ const MainContextProvider = ({ children }) => {
       let newLedgerScreenTxt;
       let newLedgerStatus;
       if(mainContextState.profile){
-
+        // This part is to use the ledger a a validation device
+        // It is not available as it now.
       } else {
         if(btnNum === 1){
           displayDashboardKeyboard = true;
@@ -84,10 +86,11 @@ const MainContextProvider = ({ children }) => {
     }
   }
 
-  const handleKeyboardBtnClick = (btnTxt = "") => {
+  const handleKeyboardBtnClick = async (btnTxt = "") => {
     let newTxt = "";
     let newProfile = null;
     let newVotingDeviceState = votingDeviceStates.hub;
+    let newLedgerScreenTxt = mainContextState.ledgerScreenTxt;
     let displayKeyboardBtn = true;
     let displayKeyboardForm = false;
     if(btnTxt !== ""){
@@ -97,12 +100,25 @@ const MainContextProvider = ({ children }) => {
           newProfile = profiles.admin
           newVotingDeviceState = votingDeviceStates.admin.adminHub;
         } else {
-          newTxt = votingScreenTextArray.hub.voter.welcome;
-          newProfile = profiles.voter
-          newVotingDeviceState = votingDeviceStates.voter.voterHub;
+          try {
+            const isVoter = await contract.methods.getVoter(accounts[0]).call({ from: accounts[0] });
+            if(isVoter) {
+              newTxt = votingScreenTextArray.hub.voter.welcome;
+              newProfile = profiles.voter
+              newVotingDeviceState = votingDeviceStates.voter.voterHub;
+              newLedgerScreenTxt = ledgerScreenTextArray.connected;
+            } else {
+              newTxt = votingScreenTextArray.onlyVoters;
+              newLedgerScreenTxt = ledgerScreenTextArray.rejected;
+            } 
+          } catch (error) {
+            newTxt = votingScreenTextArray.onlyVoters;
+            newLedgerScreenTxt = ledgerScreenTextArray.rejected;
+          }
         }
       } else {
         if(btnTxt === keyboardBtnTextArray.profile.global.back.txt){
+          newLedgerScreenTxt = ledgerScreenTextArray.null;
           if(mainContextState.currentState === votingDeviceStates.admin.adminHub || mainContextState.currentState === votingDeviceStates.voter.voterHub) {
             newTxt = votingScreenTextArray.chooseMode;
             newProfile = null;
@@ -130,6 +146,7 @@ const MainContextProvider = ({ children }) => {
         type: actions.update,
         data: { 
           votingDeviceScreenTxt: newTxt,
+          ledgerScreenTxt: newLedgerScreenTxt,
           profile: newProfile,
           currentState: newVotingDeviceState,
           displayKeyboardBtn: displayKeyboardBtn,
@@ -139,29 +156,29 @@ const MainContextProvider = ({ children }) => {
     }
   }
 
-  const updateVotingScreen = (newScreenTxt = "") => {
+  const updateVotingScreen = (newScreenTxt = "", fullfield = null) => {
     mainContextDispatch({
       type: actions.update,
       data: { 
         votingDeviceScreenTxt: newScreenTxt,
+        ledgerScreenTxt: fullfield === null ? mainContextState.ledgerScreenTxt : fullfield ? ledgerScreenTextArray.fullfield : ledgerScreenTextArray.rejected,
       }
     });
   }
 
-  // let oldEvents= await contract.getPastEvents('VoterRegistered', 'WorkflowStatusChange', 'ProposalRegistered', 'Voted', 'WinnerElected', 'NoWinnerElected', {
   const voterRegistrationEventCheck = async () => {
     if(contract){
-      let oldEvents= await contract.getPastEvents(eventsList.voterRegistered, {
-        fromBlock: 0,
-        toBlock: 'latest'
-      });
-      let oldies=[];
-      oldEvents.forEach(event => {
-          oldies.push({
-            eventType: event.event,
-            eventData: event.returnValues
-          });
-      });
+      // let oldEvents= await contract.getPastEvents(eventsList.voterRegistered, {
+      //   fromBlock: 0,
+      //   toBlock: 'latest'
+      // });
+      // let oldies=[];
+      // oldEvents.forEach(event => {
+      //     oldies.push({
+      //       eventType: event.event,
+      //       eventData: event.returnValues
+      //     });
+      // });
       // setOldEvents(oldies);
 
       await contract.events.VoterRegistered({fromBlock:'earliest'})
@@ -169,29 +186,28 @@ const MainContextProvider = ({ children }) => {
           const formattedAddress = formatETHAddress(event.returnValues.voterAddress)
           updateVotingScreen(`"${formattedAddress}" registration successful`);
         })          
-      .on('changed', changed => console.log(changed))
-      .on('error', err => console.log(err))
-      .on('connected', str => console.log(str))
+      // .on('changed', changed => console.log(changed))
+      // .on('error', err => console.log(err))
+      // .on('connected', str => console.log(str))
     }
   }
   const workflowStatusChangeEventCheck = async () => {
     if(contract){
-      let oldEvents= await contract.getPastEvents('WorkflowStatusChange', {
-        fromBlock: 0,
-        toBlock: 'latest'
-      });
-      let oldies=[];
-      oldEvents.forEach(event => {
-          oldies.push({
-            eventType: event.event,
-            eventData: event.returnValues
-          });
-      });
+      // let oldEvents= await contract.getPastEvents('WorkflowStatusChange', {
+      //   fromBlock: 0,
+      //   toBlock: 'latest'
+      // });
+      // let oldies=[];
+      // oldEvents.forEach(event => {
+      //     oldies.push({
+      //       eventType: event.event,
+      //       eventData: event.returnValues
+      //     });
+      // });
       // setOldEvents(oldies);
 
       await contract.events.WorkflowStatusChange({fromBlock:'earliest'})
       .on('data', event => {
-          console.log(event.returnValues);
           let newWorkflowStatus;
           if(event.returnValues[0] === "0" && event.returnValues[1] === "1") {
               newWorkflowStatus = workflowStatus.proposalsRegistrationStarted;
@@ -216,9 +232,9 @@ const MainContextProvider = ({ children }) => {
             },
         }) 
       })       
-      .on('changed', changed => console.log(changed))
-      .on('error', err => console.log(err))
-      .on('connected', str => console.log(str))
+      // .on('changed', changed => console.log(changed))
+      // .on('error', err => console.log(err))
+      // .on('connected', str => console.log(str))
     }
   }
 
@@ -228,6 +244,41 @@ const MainContextProvider = ({ children }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract])
 
+  useEffect(() => {
+    (async function () {
+      if (contract) {
+        const owner = await contract.methods.owner().call({ from: accounts[0] });
+        const isOwner = owner === accounts[0] ? true : false;
+        mainContextDispatch({
+          type: actions.update,
+          data: { 
+            isContractAvailable: true,
+            isOwner: isOwner,
+            isLedgerEnabled: true,
+            ledgerScreenTxt: ledgerScreenTextArray.disconnected,
+            votingDeviceScreenTxt: votingScreenTextArray.init,
+          }
+        });
+      } else {
+        mainContextDispatch({
+          type: actions.update,
+          data: { 
+            isContractAvailable: false,
+            isLedgerEnabled: false,
+            ledgerScreenTxt: ledgerScreenTextArray.null,
+            displayKeyboardBtn: false,
+            displayKeyboardForm: false,
+            votingDeviceScreenTxt: votingScreenTextArray.outOfOrder,
+          }
+        });
+      }
+    })();
+  }, [contract, accounts]);
+
+  useEffect(() => {
+    accounts && resetDAppDisplay();
+  }, [accounts])
+  
   const contextValues = useMemo(
     () => ({
       mainContextState,

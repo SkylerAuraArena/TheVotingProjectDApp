@@ -11,7 +11,7 @@ const Keyboard = () => {
   const backBtn = <Button title={mainContextState.keyboardBtnTxt.profile.global.back.txt} color={mainContextState.keyboardBtnTxt.profile.global.back.css} />;
 
   const chooseModeBtnArray = <>
-    <Button title={mainContextState.keyboardBtnTxt.profile.admin.txt} color={mainContextState.keyboardBtnTxt.profile.admin.css} />
+    { mainContextState.isOwner && <Button title={mainContextState.keyboardBtnTxt.profile.admin.txt} color={mainContextState.keyboardBtnTxt.profile.admin.css} /> }
     <Button title={mainContextState.keyboardBtnTxt.profile.voter.txt} color={mainContextState.keyboardBtnTxt.profile.voter.css} />
   </>
 

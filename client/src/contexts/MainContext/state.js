@@ -69,7 +69,9 @@ const votingDeviceStates = {
 }
 
 const votingScreenTextArray = {
+  outOfOrder: "Out of order",
   init: "Welcome, please connect your ledger",
+  onlyVoters: "Only registered voters may vote",
   chooseMode: "Choose your job",
   hub: {
     admin: {
@@ -94,8 +96,11 @@ const votingScreenTextArray = {
 }
 
 const ledgerScreenTextArray = {
+  null: "",
   disconnected: "Connect ?",
   connected: "Connected",
+  fullfield: "Trx fullfield",
+  rejected: "Trx rejected",
 }
 
 const keyboardBtnTextArray = {
@@ -138,6 +143,8 @@ const keyboardBtnTextArray = {
 }
 
 const initialState = {
+  isContractAvailable: false,
+  isOwner: false,
   profile: null,
   currentState: votingDeviceStates.hub,
   currentWorkflowStatus: workflowStatus.registeringVoters,

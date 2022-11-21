@@ -34,7 +34,7 @@ const Form = ({ elt }) => {
                 returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](data?.addressInput ?? data.addressInput).call({ from: accounts[0] });   
                 switch (elt.func.name) {
                     case "getVoter":
-                        updateVotingScreen(returnValue[0] ? "This address is registered as a voter" : "This address is not registered as a voter")
+                        updateVotingScreen(returnValue[0] ? "This address is registered as a voter" : "This address is not registered as a voter", true)
                         break;
                     default:
                         break;
@@ -42,7 +42,7 @@ const Form = ({ elt }) => {
             }
             returnValue && console.log(returnValue);   
         } catch (error) {
-            updateVotingScreen("Invalid address or voter already registered");
+            updateVotingScreen("Invalid address or voter already registered", false);
         }
         addressInputRef.current.value = "";
         addressInputRef.current.focus();

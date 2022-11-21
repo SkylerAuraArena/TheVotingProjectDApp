@@ -30,55 +30,55 @@ export const Button = ({ title, color, func, args = false }) => {
           if(mainContextState.profile === profiles.admin){
             switch (func.name) {
               case solidityFunctionsList.admin.addVoter:
-                  updateVotingScreen("Impossible to add new voters now.")
+                  updateVotingScreen("Impossible to add new voters now.", false)
                   break;
               case solidityFunctionsList.admin.startProposalsRegistering:
-                  updateVotingScreen("Impossible : no voter registered or session already started / over.")
+                  updateVotingScreen("Impossible : no voter registered or session already started / over.", false)
                   break;
               case solidityFunctionsList.admin.endProposalsRegistering:
-                  updateVotingScreen("Impossible de end the proposal registration now.")
+                  updateVotingScreen("Impossible de end the proposal registration now.", false)
                   break;
               case solidityFunctionsList.admin.startVotingSession:
-                  updateVotingScreen("Impossible de start the voting session now.")
+                  updateVotingScreen("Impossible de start the voting session now.", false)
                   break;
               case solidityFunctionsList.admin.endVotingSession:
-                  updateVotingScreen("Impossible de end the voting session now.")
+                  updateVotingScreen("Impossible de end the voting session now.", false)
                   break;
               case solidityFunctionsList.admin.tallyVotes:
-                  updateVotingScreen("Impossible to tally votes now.")
+                  updateVotingScreen("Impossible to tally votes now.", false)
                   break;
               default:
-                  updateVotingScreen("Invalid action")
+                  updateVotingScreen("Invalid action", false)
                   break;
             }
           } else {
             switch (func.name) {
               case solidityFunctionsList.voter.getVotersList:
-                  updateVotingScreen("You may not get the voters list.")
+                  updateVotingScreen("You may not get the voters list.", false)
                   break;
               case solidityFunctionsList.voter.getVoter:
-                  updateVotingScreen("")
+                  updateVotingScreen("", false)
                   break;
               case solidityFunctionsList.voter.getVotersVotes:
-                  updateVotingScreen("Impossible de end the proposal registration now.")
+                  updateVotingScreen("Impossible de end the proposal registration now.", false)
                   break;
               case solidityFunctionsList.voter.getProposalsList:
-                  updateVotingScreen("Impossible de start the voting session now.")
+                  updateVotingScreen("Impossible de start the voting session now.", false)
                   break;
               case solidityFunctionsList.voter.getOneProposal:
-                  updateVotingScreen("Impossible de end the voting session now.")
+                  updateVotingScreen("Impossible de end the voting session now.", false)
                   break;
               case solidityFunctionsList.voter.addProposal:
-                  updateVotingScreen("Impossible to tally votes now.")
+                  updateVotingScreen("Impossible to tally votes now.", false)
                   break;
               case solidityFunctionsList.voter.setVote:
-                  updateVotingScreen("Impossible de end the voting session now.")
+                  updateVotingScreen("Impossible de end the voting session now.", false)
                   break;
               case solidityFunctionsList.voter.winningProposalID:
-                  updateVotingScreen("Impossible to tally votes now.")
+                  updateVotingScreen("Impossible to tally votes now.", false)
                   break;
               default:
-                  updateVotingScreen("Invalid action")
+                  updateVotingScreen("Invalid action", false)
                   break;
             }
           }
