@@ -10,7 +10,7 @@ import "../node_modules/@openzeppelin/contracts/utils/Strings.sol";
  */
 contract Voting is Ownable {
 
-    uint public winningProposalID;
+    uint private winningProposalID;
     bool private winnerElected;
     
     struct Voter {
@@ -49,6 +49,7 @@ contract Voting is Ownable {
     event Voted (address voter, uint proposalId);
     event WinnerElected(uint winners);
     event NoWinnerElected(string message);
+    event CampaignReset(string message);
     
     /** 
      * modifier onlyVoters check whether the address is registered as a voter.
@@ -107,6 +108,15 @@ contract Voting is Ownable {
     function getProposalsList() external onlyVoters view returns (Proposal[] memory) {
         return proposalsArray;
     } 
+
+    /** 
+     * @dev Calls getWinningProposal() function to get the one proposal informations.
+     * @return winningProposalID the winning proposal's id.
+     */
+    function getWinningProposal() external onlyVoters view returns (uint) {
+        require(winnerElected, 'No winner elected yet');
+        return winningProposalID;
+    }
  
     // ::::::::::::: REGISTRATION ::::::::::::: // 
     /** 
@@ -215,8 +225,8 @@ contract Voting is Ownable {
      * @dev Computes the winning proposal taking all previous votes into account.
      * Then, set the winningProposalId with the winners' id.
      */
-    function _countVotes() internal {
-        uint winningVoteCount = 0;
+    function _countVotes() internal returns (uint _winningProposalId) {
+        uint winningVoteCount;
         // First, the maximum vote count of the proposals list is determined.
         for (uint p = 0; p < proposalsArray.length; p++) {
             if (proposalsArray[p].voteCount > winningVoteCount) {
@@ -229,15 +239,15 @@ contract Voting is Ownable {
             uint winningProposalsNumber = 0;
             for (uint p = 0; p < proposalsArray.length; p++) {
                 if (proposalsArray[p].voteCount == winningVoteCount) {
-                    winningProposalID = p;
-                    winningProposalsNumber++;
+                    _winningProposalId = p;
+                    winningProposalsNumber = winningProposalsNumber + 1;
                 }
             }
             if(winningProposalsNumber > 1) {
                 emit NoWinnerElected("Two or more proposals have the same votes count. None is elected. The vote must start over again. Try new proposals");
             } else {
-                winnerElected = true;
-                emit WinnerElected(winningProposalID);
+                emit WinnerElected(_winningProposalId);
+                return _winningProposalId;
             }
         } else {
             emit NoWinnerElected("None of the proposals has been choosen as the winning one. The vote must start over again. Try new proposals");
@@ -250,15 +260,51 @@ contract Voting is Ownable {
      */
    function tallyVotes() external onlyOwner {
        require(workflowStatus == WorkflowStatus.VotingSessionEnded, "Current status is not voting session ended");
-       uint _winningProposalId;
-      for (uint256 p = 0; p < proposalsArray.length; p++) {
-           if (proposalsArray[p].voteCount > proposalsArray[_winningProposalId].voteCount) {
-               _winningProposalId = p;
-          }
-       }
-       winningProposalID = _winningProposalId;
-       
+    //    uint _winningProposalId;
+    //   for (uint256 p = 0; p < proposalsArray.length; p++) {
+    //        if (proposalsArray[p].voteCount > proposalsArray[_winningProposalId].voteCount) {
+    //            _winningProposalId = p;
+    //       }
+    //    }
+    //    winningProposalID = _winningProposalId;
+        winningProposalID = _countVotes();
+        winnerElected = true;
+
        workflowStatus = WorkflowStatus.VotesTallied;
        emit WorkflowStatusChange(WorkflowStatus.VotingSessionEnded, WorkflowStatus.VotesTallied);
+    }
+
+    /** 
+     * @dev Calls _resetCampaign() function reset both voters' addresses array and the voters' infos mapping.
+     */
+    function _resetCampaign() internal {
+        for (uint i = 0; i < votersAddresses.length; i++) {
+            // iterate over the voters' addresses array to iterate over the voters' mapping and reset all to value
+            voters[votersAddresses[i]].isRegistered = false;
+            voters[votersAddresses[i]].hasVoted = false;
+            voters[votersAddresses[i]].votedProposalId = 0;
+        }
+        for (uint i = 0; i < proposalsArray.length; i++) {
+            // iterate over the proposals' descriptions array to iterate over the proposals' mapping and reset all to value
+            proposalsDescriptions[proposalsArray[i].description] = false;
+        }
+        delete proposalsArray;
+        delete votersAddresses;
+        winningProposalID = 0;
+        if(winnerElected == true) {
+            winnerElected = false;
+            winningProposalID = 0;
+        }
+    }
+
+    /** 
+     * @dev Calls closeCampaign() function anables the chairperson to close the current campaign.
+     * modifier onlyOwner form Openzeppelin's contract indicating the function is only usable with the contract creator's address.
+     */
+    function resetCampaign() public onlyOwner {
+        _resetCampaign();
+        workflowStatus = WorkflowStatus.RegisteringVoters;
+        emit WorkflowStatusChange(WorkflowStatus.RegisteringVoters, WorkflowStatus.RegisteringVoters);
+        emit CampaignReset("The current campaign has just been reset");
     }
 }

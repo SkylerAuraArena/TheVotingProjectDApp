@@ -107,7 +107,7 @@ const MainContextProvider = ({ children }) => {
           newTxt = votingScreenTextArray.hub.admin.welcome;
           newProfile = profiles.admin
           newVotingDeviceState = votingDeviceStates.admin.adminHub;
-        } else {
+        } else if(btnTxt === profiles.voter){
           try {
             const isVoter = await contract.methods.getVoter(accounts[0]).call({ from: accounts[0] });
             if(isVoter) {
@@ -121,6 +121,17 @@ const MainContextProvider = ({ children }) => {
             } 
           } catch (error) {
             newTxt = votingScreenTextArray.onlyVoters;
+            newLedgerScreenTxt = ledgerScreenTextArray.rejected;
+          }
+        } else if(btnTxt === profiles.all) {
+          try {
+            const winningProposalID = await contract.methods.getWinningProposal().call({ from: accounts[0] });
+            if(winningProposalID) {
+              newTxt = `${votingScreenTextArray.winnerElected}${winningProposalID}`;
+              newLedgerScreenTxt = ledgerScreenTextArray.fullfield;
+            } 
+          } catch (error) {
+            newTxt = votingScreenTextArray.winnerNotElected;
             newLedgerScreenTxt = ledgerScreenTextArray.rejected;
           }
         }
@@ -244,6 +255,29 @@ const MainContextProvider = ({ children }) => {
       // .on('connected', str => console.log(str))
     }
   }
+  const campaignResetEventCheck = async () => {
+    if(contract){
+      // let oldEvents= await contract.getPastEvents(eventsList.voterRegistered, {
+      //   fromBlock: 0,
+      //   toBlock: 'latest'
+      // });
+      // let oldies=[];
+      // oldEvents.forEach(event => {
+      //     oldies.push({
+      //       eventType: event.event,
+      //       eventData: event.returnValues
+      //     });
+      // });
+
+      await contract.events.CampaignReset({fromBlock:'earliest'})
+      .on('data', event => {
+          updateVotingScreen(`${event.returnValues[0]})`, true);
+        })          
+      // .on('changed', changed => console.log(changed))
+      // .on('error', err => console.log(err))
+      // .on('connected', str => console.log(str))
+    }
+  }
   const workflowStatusChangeEventCheck = async () => {
     if(contract){
       let oldEvents= await contract.getPastEvents('WorkflowStatusChange', {
@@ -287,9 +321,6 @@ const MainContextProvider = ({ children }) => {
           } else if(event.returnValues[0] === "4" && event.returnValues[1] === "5") {
               newWorkflowStatus = workflowStatus.votesTallied;
               updateVotingScreen(`Votes counting started`, true);
-          } else if(event.returnValues[1] === "0") {
-              newWorkflowStatus = workflowStatus.registeringVoters;
-              updateVotingScreen(`Voting process restarted`, true);
           }
           mainContextDispatch({
             type: actions.update,
@@ -309,6 +340,7 @@ const MainContextProvider = ({ children }) => {
     proposalRegistrationEventCheck();
     votesEventCheck();
     workflowStatusChangeEventCheck();
+    campaignResetEventCheck();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract, mainContextState.WorkflowStatusChange])
 

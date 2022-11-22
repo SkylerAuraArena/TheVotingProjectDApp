@@ -32,22 +32,19 @@ const AddressForm = ({ elt }) => {
                 returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](trimmedData ?? trimmedData).send({ from: accounts[0] });
             } else {
                 // await contract.methods[elt.func.name](trimmedData ?? trimmedData).call({ from: accounts[0] });   
-                console.log("BBBB", elt.func.name);
                 returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](trimmedData ?? trimmedData).call({ from: accounts[0] });   
                 switch (elt.func.name) {
                     case solidityFunctionsList.voter.getVoter:
-                        console.log("CCC");
                         updateVotingScreen(returnValue[0] ? "This address is registered as a voter" : "This address is not registered as a voter", true)
                         break;
                     case solidityFunctionsList.voter.getVotersVotes:
-                        console.log("AA");
                         updateVotingScreen(`This voter's vote has been set on proposition n°${returnValue} (id n°${returnValue - 1})`, true)
                         break;
                     default:
                         break;
                 }
             }
-            returnValue && console.log(returnValue);   
+            // returnValue && console.log(returnValue);   
         } catch (error) {
             switch (elt.func.name) {
                 case solidityFunctionsList.voter.getVoter:

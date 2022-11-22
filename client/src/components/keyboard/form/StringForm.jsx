@@ -23,11 +23,11 @@ const StringForm = ({ elt }) => {
     
     const handleFormSubmission = async (data) => {
         const trimmedData = data.stringInput.trim();
-        let returnValue;
+        // let returnValue;
         try {
             if(elt.func.mode === "send"){
-                // !errors.stringInput?.message && await contract.methods[elt.func.name](trimmedData).send({ from: accounts[0] });
-                returnValue = !errors.stringInput?.message && await contract.methods[elt.func.name](trimmedData ?? trimmedData).send({ from: accounts[0] });
+                !errors.stringInput?.message && await contract.methods[elt.func.name](trimmedData).send({ from: accounts[0] });
+                // returnValue = !errors.stringInput?.message && await contract.methods[elt.func.name](trimmedData ?? trimmedData).send({ from: accounts[0] });
             // } else {
             //     // await contract.methods[elt.func.name](trimmedData ?? trimmedData).call({ from: accounts[0] });   
             //     returnValue = !errors.stringInput?.message && await contract.methods[elt.func.name](trimmedData ?? trimmedData).call({ from: accounts[0] });   
@@ -39,7 +39,7 @@ const StringForm = ({ elt }) => {
             //             break;
             //     }
             }
-            returnValue && console.log(returnValue);   
+            // returnValue && console.log(returnValue);   
         } catch (error) {
             updateVotingScreen("Invalid proposition or proposition already registered", false);
         }

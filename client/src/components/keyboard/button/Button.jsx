@@ -80,7 +80,6 @@ export const Button = ({ title, color, func, args = false }) => {
       } else if (func.mode === "call") {
         try {
           returnValue = await contract.methods[func.name]().call({ from: accounts[0] });  
-          console.log("fsdfjskldfjs",returnValue); 
           switch (func.name) {
             case solidityFunctionsList.voter.getVotersList:
                 // const addressesList = returnValue.map((addr, index) => index === 0 ? `Enlisted voters : ${formatETHAddress(addr)}` : ` ${formatETHAddress(addr)}`);
@@ -90,6 +89,11 @@ export const Button = ({ title, color, func, args = false }) => {
             case solidityFunctionsList.voter.getProposalsList:
                 const proposalsList = returnValue.map((prop, index) => index === 0 ? `Registered proposals : n°${index} -> ${prop.description} : ${prop.voteCount} votes` : ` n°${index} -> ${prop.description} : ${prop.voteCount} votes`);
                 updateVotingScreen(proposalsList, true)
+                break;
+            case solidityFunctionsList.all.getWinningProposal:
+                const winnerDescription = await contract.methods[solidityFunctionsList.voter.getOneProposal](returnValue).call({ from: accounts[0] }); 
+                const winner = `The winning proposal is n°${parseInt(returnValue) + 1} (id n°${returnValue}) : "${winnerDescription.description}"`;
+                updateVotingScreen(winner, true)
                 break;
             default:
                 break;
@@ -127,7 +131,7 @@ export const Button = ({ title, color, func, args = false }) => {
     } else {
       handleKeyboardBtnClick(txt)
     }
-    returnValue && console.log("Terminado",returnValue);
+    // returnValue && console.log("Terminado",returnValue);
   }
 
   return (

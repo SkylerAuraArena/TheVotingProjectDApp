@@ -8,6 +8,7 @@ contract("Voting", accounts => {
     const secondAddress = accounts[1];
     const thirdAddress = accounts[2];
     const fourthAddress = accounts[3];
+    const fifthddress = accounts[4];
 
     let VotingTestInstance;
 
@@ -232,10 +233,10 @@ contract("Voting", accounts => {
             await expectRevert(VotingTestInstance.tallyVotes({ from: owner }), "Current status is not voting session ended");
         });
 
-        it("...should return the winning proposal id which is to be 0 on initialization", async () => {
-            const winningProposalId = await VotingTestInstance.winningProposalID.call();
-            expect(new BN(winningProposalId)).to.be.bignumber.equal(new BN(0));
-        });
+        // it("...should return the winning proposal id which is to be 0 on initialization", async () => {
+        //     const winningProposalId = await VotingTestInstance.getWinningProposal.call();
+        //     expect(new BN(winningProposalId)).to.be.bignumber.equal(new BN(0));
+        // });
     });
 
     describe("Talling Votes tests with workflow set on VotesTallied", function () {
@@ -245,6 +246,7 @@ contract("Voting", accounts => {
             await VotingTestInstance.addVoter(owner, { from: owner });
             await VotingTestInstance.addVoter(secondAddress, { from: owner });
             await VotingTestInstance.addVoter(thirdAddress, { from: owner });
+            await VotingTestInstance.addVoter(fifthddress, { from: owner });
             await VotingTestInstance.startProposalsRegistering();
             await VotingTestInstance.addProposal("Second", { from: secondAddress });
             await VotingTestInstance.addProposal("Third", { from: thirdAddress });
@@ -252,7 +254,8 @@ contract("Voting", accounts => {
             await VotingTestInstance.startVotingSession();
             await VotingTestInstance.setVote(2, { from: owner });
             await VotingTestInstance.setVote(2, { from: secondAddress });
-            await VotingTestInstance.setVote(2, { from: thirdAddress });
+            await VotingTestInstance.setVote(1, { from: thirdAddress });
+            await VotingTestInstance.setVote(1, { from: fifthddress });
             await VotingTestInstance.endVotingSession();
             await VotingTestInstance.tallyVotes();
         });
@@ -262,7 +265,7 @@ contract("Voting", accounts => {
         });
 
         it("...should return the winning proposal id which is to be 2 when votes are tallied", async () => {
-            const winningProposalId = await VotingTestInstance.winningProposalID.call();
+            const winningProposalId = await VotingTestInstance.getWinningProposal.call();
             expect(new BN(winningProposalId)).to.be.bignumber.equal(new BN(2));
         });
     });

@@ -40,7 +40,7 @@ const UintForm = ({ elt }) => {
                         break;
                 }
             }
-            returnValue && console.log(returnValue);   
+            // returnValue && console.log(returnValue);   
         } catch (error) {
             switch (elt.func.name) {
                 case solidityFunctionsList.voter.getOneProposal:

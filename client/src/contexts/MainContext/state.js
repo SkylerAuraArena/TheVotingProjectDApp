@@ -7,6 +7,7 @@ const actions = {
 const profiles = {
   admin: "Admin",
   voter: "Voter",
+  all: "Show winning proposal id",
 }
 
 const functionsModes = {
@@ -21,6 +22,7 @@ const eventsList = {
   voted: "Voted",
   winnerElected: "WinnerElected",
   noWinnerElected: "NoWinnerElected",
+  campaignReset: "CampaignReset",
 }
 
 const solidityFunctionsList = {
@@ -31,6 +33,7 @@ const solidityFunctionsList = {
     startVotingSession: "startVotingSession",
     endVotingSession: "endVotingSession",
     tallyVotes: "tallyVotes",
+    resetCampaign: "resetCampaign",
   },
   voter: {
     getVotersList: "getVotersList",
@@ -41,6 +44,9 @@ const solidityFunctionsList = {
     addProposal: "addProposal",
     setVote: "setVote",
     winningProposalID: "winningProposalID",
+  },
+  all: {
+    getWinningProposal: "getWinningProposal",
   }
 }
 
@@ -67,6 +73,9 @@ const votingDeviceStates = {
     addProposal: "addProposal",
     setVote: "setVote",
   },
+  all: {
+    getWinningProposal: "getWinningProposal",
+  }
 
 }
 
@@ -75,6 +84,8 @@ const votingScreenTextArray = {
   init: "Welcome, please connect your ledger",
   onlyVoters: "Only registered voters may vote",
   chooseMode: "Choose your job",
+  winnerElected: "The winning proposal is n°",
+  winnerNotElected: "There is no winner elected for now",
   hub: {
     admin: {
       welcome: "Welcome admin, select one option",
@@ -124,15 +135,20 @@ const keyboardBtnTextArray = {
       txt: profiles.voter,
       css: "bg-emerald-500",
     },
+    all: {
+      txt: profiles.all,
+      css: "bg-amber-400",
+    },
   },
   mainOptions: {
     admin: [
       {txt: "Register new voter", css:"bg-blue-500", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.addVoter, params: true}},
-      {txt: "Start proposals registration", css:"bg-red-500", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.startProposalsRegistering, params: false}},
-      {txt: "End proposals registration", css:"bg-red-500", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.endProposalsRegistering, params: false}},
-      {txt: "Start voting session", css:"bg-red-500", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.startVotingSession, params: false}},
-      {txt: "End voting session", css:"bg-red-500", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.endVotingSession, params: false}},
+      {txt: "Start proposals registration", css:"bg-orange-400", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.startProposalsRegistering, params: false}},
+      {txt: "End proposals registration", css:"bg-orange-400", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.endProposalsRegistering, params: false}},
+      {txt: "Start voting session", css:"bg-orange-400", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.startVotingSession, params: false}},
+      {txt: "End voting session", css:"bg-orange-400", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.endVotingSession, params: false}},
       {txt: "Tally votes", css:"bg-amber-400", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.tallyVotes, params: false}},
+      // {txt: "Reset campaign", css:"bg-red-500", func: {mode: functionsModes.send, name: solidityFunctionsList.admin.resetCampaign, params: false}},
     ],
     voter: [
       {txt:"Get voters' addresses list", css:"bg-emerald-500", func: {mode: functionsModes.call, name: solidityFunctionsList.voter.getVotersList, params: false}},
@@ -142,7 +158,7 @@ const keyboardBtnTextArray = {
       {txt:"Get proposal informations", css:"bg-emerald-500", func: {mode: functionsModes.call, name: solidityFunctionsList.voter.getOneProposal, params: true}},
       {txt:"Register proposal", css:"bg-blue-500", func: {mode: functionsModes.send, name: solidityFunctionsList.voter.addProposal, params: true}},
       {txt:"Vote", css:"bg-blue-500", func: {mode: functionsModes.send, name: solidityFunctionsList.voter.setVote, params: true}},
-      {txt:"Check winner", css:"bg-amber-400", func: {mode: functionsModes.call, name: solidityFunctionsList.voter.winningProposalID, params: false}},
+      {txt:"Check winner", css:"bg-amber-400", func: {mode: functionsModes.call, name: solidityFunctionsList.all.getWinningProposal, params: false}},
     ],
   },
 }

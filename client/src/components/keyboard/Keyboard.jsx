@@ -13,6 +13,7 @@ const Keyboard = () => {
   const chooseModeBtnArray = <>
     { mainContextState.isOwner && <Button title={mainContextState.keyboardBtnTxt.profile.admin.txt} color={mainContextState.keyboardBtnTxt.profile.admin.css} /> }
     <Button title={mainContextState.keyboardBtnTxt.profile.voter.txt} color={mainContextState.keyboardBtnTxt.profile.voter.css} />
+    <Button title={mainContextState.keyboardBtnTxt.profile.all.txt} color={mainContextState.keyboardBtnTxt.profile.all.css} />
   </>
 
   const adminModeControlBtnArray = mainContextState.keyboardBtnTxt.mainOptions.admin.map((elt, index) => {
@@ -36,7 +37,7 @@ const Keyboard = () => {
         case solidityFunctionsList.admin.tallyVotes:
           return mainContextState.currentWorkflowStatus === workflowStatus.votingSessionEnded || mainContextState.workflowStatusChangedPastEvents[workflowEventArrayLegth - 1]?.lastCurrentStatus === "4" ? <Button key={index} title={elt.txt} color={elt.css} func={elt.func} args={true}/> : null;
         default:
-          return null;
+          return <Button key={index} title={elt.txt} color={elt.css} func={elt.func} args={true}/>;
       }
     }
   })
@@ -76,6 +77,7 @@ const Keyboard = () => {
         case solidityFunctionsList.voter.getProposalsList:
           return mainContextState.currentWorkflowStatus !== workflowStatus.registeringVoters || mainContextState.workflowStatusChangedPastEvents[workflowEventArrayLegth - 1]?.lastCurrentStatus > "0" ? <Button key={index} title={elt.txt} color={elt.css} func={elt.func} args={true}/> : null;
         case solidityFunctionsList.voter.winningProposalID:
+        case solidityFunctionsList.all.getWinningProposal:
           return mainContextState.currentWorkflowStatus === workflowStatus.votesTallied || mainContextState.workflowStatusChangedPastEvents[workflowEventArrayLegth - 1]?.lastCurrentStatus === "5" ? <Button key={index} title={elt.txt} color={elt.css} func={elt.func} args={true}/> : null;
         default:
           return null;
