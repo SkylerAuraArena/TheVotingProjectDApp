@@ -11,7 +11,7 @@ const Screen = () => {
     
 
     return (
-        <div className="h-2/6 w-52 flexJIC p-4 bg-black text-matrixGreen shadow-2xl">
+        <div className="h-2/6 w-52 flex justify-center items-start p-2 bg-black text-matrixGreen shadow-2xl overflow-y-auto">
             <div ref={screenRef} className="flexJIC text-xl cursor-default"></div>
         </div>
     )

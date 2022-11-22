@@ -24,14 +24,15 @@ const Form = ({ elt }) => {
     const { state: { contract, accounts } } = useEth();
     
     const handleFormSubmission = async (data) => {
+        const trimmedData = data.addressInput.trim();
         let returnValue;
         try {
             if(elt.func.mode === "send"){
-                // !errors.addressInput?.message && await contract.methods[elt.func.name](data.addressInput).send({ from: accounts[0] });
-                returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](data.addressInput).send({ from: accounts[0] });
+                // !errors.addressInput?.message && await contract.methods[elt.func.name](trimmedData).send({ from: accounts[0] });
+                returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](trimmedData).send({ from: accounts[0] });
             } else {
-                // await contract.methods[elt.func.name](data?.addressInput ?? data.addressInput).call({ from: accounts[0] });   
-                returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](data?.addressInput ?? data.addressInput).call({ from: accounts[0] });   
+                // await contract.methods[elt.func.name](trimmedData ?? trimmedData).call({ from: accounts[0] });   
+                returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](trimmedData ?? trimmedData).call({ from: accounts[0] });   
                 switch (elt.func.name) {
                     case "getVoter":
                         updateVotingScreen(returnValue[0] ? "This address is registered as a voter" : "This address is not registered as a voter", true)
