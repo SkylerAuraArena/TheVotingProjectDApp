@@ -1,14 +1,7 @@
-html {
-  font-size: 10px;
-  font-family: sans-serif;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-* {
-  margin: 0;
-  padding: 0;
-}
-
-#root {
-  width: 100vw;
-  height: 100vh;
+.flexJIC{
+  @apply flex justify-center items-center;
 }

@@ -18,7 +18,7 @@ function EthProvider({ children }) {
           address = artifact.networks[networkID].address;
           contract = new web3.eth.Contract(abi, address);
         } catch (err) {
-          console.error(err);
+          console.error(err.data.data);
         }
         dispatch({
           type: actions.init,
@@ -30,7 +30,7 @@ function EthProvider({ children }) {
   useEffect(() => {
     const tryInit = async () => {
       try {
-        const artifact = require("../../contracts/SimpleStorage.json");
+        const artifact = require("../../contracts/Voting.json");
         init(artifact);
       } catch (err) {
         console.error(err);
@@ -55,7 +55,7 @@ function EthProvider({ children }) {
   return (
     <EthContext.Provider value={{
       state,
-      dispatch
+      dispatch,
     }}>
       {children}
     </EthContext.Provider>

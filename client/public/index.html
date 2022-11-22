@@ -7,15 +7,25 @@
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="React Truffle Box"
+      content="A voting app made with React Truffle Box for Alyra"
     />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
+            gridTemplateRows: {
+              '12': 'repeat(12, 1fr)',
+            },
+            gridRow: {
+              'span-10': 'span 10 / span 10',
+            },
             colors: {
-              clifford: '#da373d',
+              matrixGreen: 'rgb(3, 160, 98)',
+            },
+            height: {
+              '90%': '90%',
+              'maxPanel': '596px',
             }
           }
         }
@@ -23,8 +33,8 @@
     </script>
     <style type="text/tailwindcss">
       @layer utilities {
-        .content-auto {
-          content-visibility: auto;
+        .flexJIC{
+          @apply flex justify-center items-center;
         }
       }
     </style>

@@ -1,28 +1,26 @@
+import Booth from "./components/booth/Booth";
+// import Demo from "./components/Demo";
+// import Voting from "./components/voting/Voting";
 import { EthProvider } from "./contexts/EthContext";
-import Intro from "./components/Intro/";
-import Setup from "./components/Setup";
-import Demo from "./components/Demo";
-import Footer from "./components/Footer";
-import "./App.css";
+import MainContextProvider from "./contexts/MainContext/MainContextProvider";
 
 function App() {
   return (
     <EthProvider>
-      {/* <div id="App" >
-        <div className="container">
-          <Intro />
-          <hr />
-          <Setup />
-          <hr />
-          <Demo />
-          <hr />
-          <Footer />
-        </div>
-      </div> */}
-      <div className="bg-red-600">
-        Hello
-      </div>
-    </EthProvider>
+        <MainContextProvider>
+          {/* <div id="App" >
+            <div className="container">
+              <Demo />
+            </div>
+          </div> */}
+          {/* <div>
+            <Voting />
+          </div> */}
+          <div className="w-100 h-screen flexJIC">
+            <Booth />
+          </div>
+        </MainContextProvider>
+      </EthProvider>
   );
 }
 
