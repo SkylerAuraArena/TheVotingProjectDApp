@@ -25,7 +25,7 @@ const MainContextProvider = ({ children }) => {
     let newTxt;
     let newProfile;
     let newVotingDeviceState;
-    let newLedgerScreenTxt = ledgerScreenTextArray.null;
+    let newLedgerScreenTxt = ledgerScreenTextArray.pending;
     if(funcName === votingDeviceStates.admin.addVoter){
       newTxt = votingScreenTextArray.hub.admin.sendAddress;
       newProfile = profiles.admin
@@ -34,6 +34,14 @@ const MainContextProvider = ({ children }) => {
       newTxt = votingScreenTextArray.hub.voter.getVoter;
       newProfile = profiles.voter
       newVotingDeviceState = votingDeviceStates.voter.getVoter;
+    } else if(funcName === votingDeviceStates.voter.getVotersVotes){
+      newTxt = votingScreenTextArray.hub.voter.getVotersVotes;
+      newProfile = profiles.voter
+      newVotingDeviceState = votingDeviceStates.voter.getVotersVotes;
+    } else if(funcName === votingDeviceStates.voter.getOneProposal){
+      newTxt = votingScreenTextArray.hub.voter.getProposal;
+      newProfile = profiles.voter
+      newVotingDeviceState = votingDeviceStates.voter.getOneProposal;
     } else if(funcName === votingDeviceStates.voter.addProposal){
       newTxt = votingScreenTextArray.hub.voter.addProposal;
       newProfile = profiles.voter
@@ -90,7 +98,7 @@ const MainContextProvider = ({ children }) => {
     let newTxt = "";
     let newProfile = null;
     let newVotingDeviceState = votingDeviceStates.hub;
-    let newLedgerScreenTxt = mainContextState.ledgerScreenTxt;
+    let newLedgerScreenTxt = mainContextState.null;
     let displayKeyboardBtn = true;
     let displayKeyboardForm = false;
     if(btnTxt !== ""){
@@ -179,21 +187,20 @@ const MainContextProvider = ({ children }) => {
       //       eventData: event.returnValues
       //     });
       // });
-      // setOldEvents(oldies);
 
       await contract.events.VoterRegistered({fromBlock:'earliest'})
       .on('data', event => {
           const formattedAddress = formatETHAddress(event.returnValues.voterAddress)
-          updateVotingScreen(`"${formattedAddress}" registration successful`);
+          updateVotingScreen(`"${formattedAddress}" registration successful`, true);
         })          
       // .on('changed', changed => console.log(changed))
       // .on('error', err => console.log(err))
       // .on('connected', str => console.log(str))
     }
   }
-  const workflowStatusChangeEventCheck = async () => {
+  const votesEventCheck = async () => {
     if(contract){
-      // let oldEvents= await contract.getPastEvents('WorkflowStatusChange', {
+      // let oldEvents= await contract.getPastEvents(eventsList.voterRegistered, {
       //   fromBlock: 0,
       //   toBlock: 'latest'
       // });
@@ -204,33 +211,92 @@ const MainContextProvider = ({ children }) => {
       //       eventData: event.returnValues
       //     });
       // });
-      // setOldEvents(oldies);
 
+      await contract.events.Voted({fromBlock:'earliest'})
+      .on('data', event => {
+          updateVotingScreen(`${votingScreenTextArray.hub.voter.voteSet}${event.returnValues[1]})`, true);
+        })          
+      // .on('changed', changed => console.log(changed))
+      // .on('error', err => console.log(err))
+      // .on('connected', str => console.log(str))
+    }
+  }
+  const proposalRegistrationEventCheck = async () => {
+    if(contract){
+      // let oldEvents= await contract.getPastEvents(eventsList.voterRegistered, {
+      //   fromBlock: 0,
+      //   toBlock: 'latest'
+      // });
+      // let oldies=[];
+      // oldEvents.forEach(event => {
+      //     oldies.push({
+      //       eventType: event.event,
+      //       eventData: event.returnValues
+      //     });
+      // });
+
+      await contract.events.ProposalRegistered({fromBlock:'earliest'})
+      .on('data', event => {
+          updateVotingScreen(`Proposal registration successful (id n°${event.returnValues[0]})`, true);
+        })          
+      // .on('changed', changed => console.log(changed))
+      // .on('error', err => console.log(err))
+      // .on('connected', str => console.log(str))
+    }
+  }
+  const workflowStatusChangeEventCheck = async () => {
+    if(contract){
+      let oldEvents= await contract.getPastEvents('WorkflowStatusChange', {
+        fromBlock: 0,
+        toBlock: 'latest'
+      });
+      let oldies = [];
+      oldEvents.forEach(event => {
+          oldies.push({
+            // eventType: event.event,
+            // eventData: event.returnValues
+            lastCurrentStatus: event.returnValues[1],
+          });
+      });
+      if(oldies.length > 0){
+        mainContextDispatch({
+          type: actions.update,
+          data: {
+            workflowStatusChangedPastEvents: oldies,
+          },
+        }) 
+      }
+
+      // let newWorkflowStatus = await contract.methods.workflowStatus().call({ from: accounts[0] }); 
+      // console.log("WFS", newWorkflowStatus);
+      let newWorkflowStatus = mainContextState.currentWorkflowStatus;
       await contract.events.WorkflowStatusChange({fromBlock:'earliest'})
       .on('data', event => {
-          let newWorkflowStatus;
           if(event.returnValues[0] === "0" && event.returnValues[1] === "1") {
               newWorkflowStatus = workflowStatus.proposalsRegistrationStarted;
-              updateVotingScreen(`Voters registration over, proposals registration started`);
+              updateVotingScreen(`Voters registration over, proposals registration started`, true);
           } else if(event.returnValues[0] === "1" && event.returnValues[1] === "2") {
               newWorkflowStatus = workflowStatus.proposalsRegistrationEnded;
-              updateVotingScreen(`Proposals registration over`);
+              updateVotingScreen(`Proposals registration over`, true);
           } else if(event.returnValues[0] === "2" && event.returnValues[1] === "3") {
               newWorkflowStatus = workflowStatus.votingSessionStarted;
-              updateVotingScreen(`Voting session started`);
+              updateVotingScreen(`Voting session started`, true);
           } else if(event.returnValues[0] === "3" && event.returnValues[1] === "4") {
               newWorkflowStatus = workflowStatus.votingSessionEnded;
-              updateVotingScreen(`Voting session over`);
+              updateVotingScreen(`Voting session over`, true);
           } else if(event.returnValues[0] === "4" && event.returnValues[1] === "5") {
               newWorkflowStatus = workflowStatus.votesTallied;
-              updateVotingScreen(`Votes counting started`);
+              updateVotingScreen(`Votes counting started`, true);
+          } else if(event.returnValues[1] === "0") {
+              newWorkflowStatus = workflowStatus.registeringVoters;
+              updateVotingScreen(`Voting process restarted`, true);
           }
           mainContextDispatch({
             type: actions.update,
             data: {
               currentWorkflowStatus: newWorkflowStatus,
             },
-        }) 
+          }) 
       })       
       // .on('changed', changed => console.log(changed))
       // .on('error', err => console.log(err))
@@ -240,9 +306,11 @@ const MainContextProvider = ({ children }) => {
 
   useEffect(() => {
     voterRegistrationEventCheck();
+    proposalRegistrationEventCheck();
+    votesEventCheck();
     workflowStatusChangeEventCheck();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract])
+  }, [contract, mainContextState.WorkflowStatusChange])
 
   useEffect(() => {
     (async function () {
@@ -292,6 +360,7 @@ const MainContextProvider = ({ children }) => {
       handleLedgerBtnClick,
       handleKeyboardBtnClick,
       updateVotingScreen,
+      workflowStatusChangeEventCheck,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [

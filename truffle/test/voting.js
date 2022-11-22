@@ -15,6 +15,7 @@ contract("Voting", accounts => {
 
         beforeEach(async function () {
             VotingTestInstance = await Voting.new({ from: owner });
+            // expectEvent(VotingTestInstance,"OwnershipTransferred", {previousOwner: address0, newOwner: owner});
         });
 
         it("...should return the current workflow status which is to be 0 (RegisteringVoters) after initialization", async () => {
@@ -23,65 +24,64 @@ contract("Voting", accounts => {
         });     
 
         it("...should change the current workflow status from 0 to 1 and get the WorkflowStatusChange event", async () => {
-            const newStatusEvent = await VotingTestInstance.startProposalsRegistering();
-            // expectEvent(newStatusEvent,"OwnershipTransferred", {previousOwner: address0, newOwner: owner});
+            const newStatusEvent = await VotingTestInstance.startProposalsRegistering({ from: owner });
             expectEvent(newStatusEvent,"WorkflowStatusChange" ,{previousStatus: new BN(0), newStatus: new BN(1)});
         });   
 
         it("...should return the new current workflow status which is to be 1 (ProposalsRegistrationStarted)", async () => {
-            await VotingTestInstance.startProposalsRegistering();
+            await VotingTestInstance.startProposalsRegistering({ from: owner });
             const status = await VotingTestInstance.workflowStatus.call();
             expect(status).to.be.bignumber.equal(new BN(1));
         });        
 
         it("...should return the new current workflow status which is to be 2 (ProposalsRegistrationEnded)", async () => {
-            await VotingTestInstance.startProposalsRegistering();
-            await VotingTestInstance.endProposalsRegistering();
+            await VotingTestInstance.startProposalsRegistering({ from: owner });
+            await VotingTestInstance.endProposalsRegistering({ from: owner });
             const status = await VotingTestInstance.workflowStatus.call();
             expect(status).to.be.bignumber.equal(new BN(2));
         });    
 
         it("...should return the new current workflow status which is to be 3 (VotingSessionStarted)", async () => {
-            await VotingTestInstance.startProposalsRegistering();
-            await VotingTestInstance.endProposalsRegistering();
-            await VotingTestInstance.startVotingSession();
+            await VotingTestInstance.startProposalsRegistering({ from: owner });
+            await VotingTestInstance.endProposalsRegistering({ from: owner });
+            await VotingTestInstance.startVotingSession({ from: owner });
             const status = await VotingTestInstance.workflowStatus.call();
             expect(status).to.be.bignumber.equal(new BN(3));
         });        
 
         it("...should return the new current workflow status which is to be 4 (VotingSessionEnded)", async () => {
-            await VotingTestInstance.startProposalsRegistering();
-            await VotingTestInstance.endProposalsRegistering();
-            await VotingTestInstance.startVotingSession();
-            await VotingTestInstance.endVotingSession();
+            await VotingTestInstance.startProposalsRegistering({ from: owner });
+            await VotingTestInstance.endProposalsRegistering({ from: owner });
+            await VotingTestInstance.startVotingSession({ from: owner });
+            await VotingTestInstance.endVotingSession({ from: owner });
             const status = await VotingTestInstance.workflowStatus.call();
             expect(status).to.be.bignumber.equal(new BN(4));
         });        
 
         it("...should return the new current workflow status which is to be 5 (VotesTallied)", async () => {
-            await VotingTestInstance.startProposalsRegistering();
-            await VotingTestInstance.endProposalsRegistering();
-            await VotingTestInstance.startVotingSession();
-            await VotingTestInstance.endVotingSession();
-            await VotingTestInstance.tallyVotes();
+            await VotingTestInstance.startProposalsRegistering({ from: owner });
+            await VotingTestInstance.endProposalsRegistering({ from: owner });
+            await VotingTestInstance.startVotingSession({ from: owner });
+            await VotingTestInstance.endVotingSession({ from: owner });
+            await VotingTestInstance.tallyVotes({ from: owner });
             const status = await VotingTestInstance.workflowStatus.call();
             expect(status).to.be.bignumber.equal(new BN(5));
         }); 
         
         it("...should revert when trying to change the current workflow status from 0 (RegisteringVoters) to 2 (ProposalsRegistrationStarted)", async () => {
-            await expectRevert(VotingTestInstance.endProposalsRegistering(), "Registering proposals havent started yet");
+            await expectRevert(VotingTestInstance.endProposalsRegistering({ from: owner }), "Registering proposals havent started yet");
         });        
         
         it("...should revert when trying to change the current workflow status from 0 (RegisteringVoters) to 3 (VotingSessionStarted)", async () => {
-            await expectRevert(VotingTestInstance.startVotingSession(), "Registering proposals phase is not finished");
+            await expectRevert(VotingTestInstance.startVotingSession({ from: owner }), "Registering proposals phase is not finished");
         });   
         
         it("...should revert when trying to change the current workflow status from 0 (RegisteringVoters) to 4 (VotingSessionEnded)", async () => {
-            await expectRevert(VotingTestInstance.endVotingSession(), "Voting session havent started yet");
+            await expectRevert(VotingTestInstance.endVotingSession({ from: owner }), "Voting session havent started yet");
         });   
         
         it("...should revert when trying to change the current workflow status from 0 (RegisteringVoters) to 5 (VotesTallied)", async () => {
-            await expectRevert(VotingTestInstance.tallyVotes(), "Current status is not voting session ended");
+            await expectRevert(VotingTestInstance.tallyVotes({ from: owner }), "Current status is not voting session ended");
         });   
     });
 
@@ -106,7 +106,7 @@ contract("Voting", accounts => {
 
         it("...should add a new voter then get the default proposal description", async () => {
             await VotingTestInstance.addVoter(owner, { from: owner });
-            await VotingTestInstance.startProposalsRegistering();
+            await VotingTestInstance.startProposalsRegistering({ from: owner });
             const addedProposal = await VotingTestInstance.getOneProposal(0);
             expect(addedProposal.description).to.equal("GENESIS");
         });
@@ -130,7 +130,7 @@ contract("Voting", accounts => {
 
         it("...should revert trying to register a new voter whereas voters registration in not opened", async () => {
             await VotingTestInstance.addVoter(owner, { from: owner });
-            await VotingTestInstance.startProposalsRegistering();
+            await VotingTestInstance.startProposalsRegistering({ from: owner });
             await expectRevert(VotingTestInstance.addVoter(secondAddress, { from: owner }), "Voters registration is not open yet");
         });
     });
@@ -175,7 +175,7 @@ contract("Voting", accounts => {
         });
 
         it("...should revert when the new proposal's description is an empty string", async () => {
-            await expectRevert(VotingTestInstance.addProposal("", { from: secondAddress }),"Vous ne pouvez pas ne rien proposer");
+            await expectRevert(VotingTestInstance.addProposal("", { from: secondAddress }),"You cannot add an empty proposal");
         });
     });
 
@@ -201,10 +201,10 @@ contract("Voting", accounts => {
             VotingTestInstance = await Voting.new({ from: owner });
             await VotingTestInstance.addVoter(owner, { from: owner });
             await VotingTestInstance.addVoter(secondAddress, { from: owner });
-            await VotingTestInstance.startProposalsRegistering();
+            await VotingTestInstance.startProposalsRegistering({ from: owner });
             await VotingTestInstance.addProposal("Second", { from: secondAddress });
-            await VotingTestInstance.endProposalsRegistering();
-            await VotingTestInstance.startVotingSession();
+            await VotingTestInstance.endProposalsRegistering({ from: owner });
+            await VotingTestInstance.startVotingSession({ from: owner });
         });
 
         it("...should vote and get the Voted event", async () => {

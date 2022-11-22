@@ -12,9 +12,9 @@ const schema = yup.object({
     addressInput: yup.string("You must provide a string formatted as an address").length(42,"The provided address's length must be 42 caracters.").matches(re,"Invalid address, need an 0x format").required("An address is required"),
   }).required()
 
-const Form = ({ elt }) => {
+const AddressForm = ({ elt }) => {
 
-    const { updateVotingScreen } = useMainContext()
+    const { updateVotingScreen, solidityFunctionsList } = useMainContext()
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
     })
@@ -29,13 +29,19 @@ const Form = ({ elt }) => {
         try {
             if(elt.func.mode === "send"){
                 // !errors.addressInput?.message && await contract.methods[elt.func.name](trimmedData).send({ from: accounts[0] });
-                returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](trimmedData).send({ from: accounts[0] });
+                returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](trimmedData ?? trimmedData).send({ from: accounts[0] });
             } else {
                 // await contract.methods[elt.func.name](trimmedData ?? trimmedData).call({ from: accounts[0] });   
+                console.log("BBBB", elt.func.name);
                 returnValue = !errors.addressInput?.message && await contract.methods[elt.func.name](trimmedData ?? trimmedData).call({ from: accounts[0] });   
                 switch (elt.func.name) {
-                    case "getVoter":
+                    case solidityFunctionsList.voter.getVoter:
+                        console.log("CCC");
                         updateVotingScreen(returnValue[0] ? "This address is registered as a voter" : "This address is not registered as a voter", true)
+                        break;
+                    case solidityFunctionsList.voter.getVotersVotes:
+                        console.log("AA");
+                        updateVotingScreen(`This voter's vote has been set on proposition n°${returnValue} (id n°${returnValue - 1})`, true)
                         break;
                     default:
                         break;
@@ -43,7 +49,16 @@ const Form = ({ elt }) => {
             }
             returnValue && console.log(returnValue);   
         } catch (error) {
-            updateVotingScreen("Invalid address or voter already registered", false);
+            switch (elt.func.name) {
+                case solidityFunctionsList.voter.getVoter:
+                    updateVotingScreen("Invalid address or voter already registered", false);
+                    break;
+                case solidityFunctionsList.voter.getVotersVotes:
+                    updateVotingScreen("Invalid address or not a registered voter", false);
+                    break;
+                default:
+                    break;
+            }
         }
         addressInputRef.current.value = "";
         addressInputRef.current.focus();
@@ -73,4 +88,4 @@ const Form = ({ elt }) => {
     )
 }
 
-export default Form
+export default AddressForm

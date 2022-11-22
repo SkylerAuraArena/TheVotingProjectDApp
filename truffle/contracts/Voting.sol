@@ -85,9 +85,9 @@ contract Voting is Ownable {
      * @return uint indicating the id of the choosen proposal according to the voter's address.
      */
     function getVotersVotes(address _addr) external view onlyVoters returns (uint) {
-        require(uint8(workflowStatus) >= 4, "Impossible to check voter's votes since the voting session hasn't started yet.");
-        require(voters[_addr].isRegistered == true, "The provided address doesn't match in the registered voters list.");
-        require(voters[_addr].hasVoted == true, "The provided address hasn't voted yet.");
+        require(uint8(workflowStatus) >= 3, "Impossible to check voter's votes since the voting session hasn't started yet");
+        require(voters[_addr].isRegistered == true, "The provided address doesn't match in the registered voters list");
+        require(voters[_addr].hasVoted == true, "The provided address hasn't voted yet");
         return voters[_addr].votedProposalId;
     }   
 
@@ -130,12 +130,12 @@ contract Voting is Ownable {
      */
     function addProposal(string calldata _desc) external onlyVoters {
         require(workflowStatus == WorkflowStatus.ProposalsRegistrationStarted, 'Proposals are not allowed yet');
-        require(keccak256(abi.encode(_desc)) != keccak256(abi.encode("")), "You cannot add en empty proposal.");
+        require(keccak256(abi.encode(_desc)) != keccak256(abi.encode("")), "You cannot add en empty proposal");
         //Here, I used a mapping over a loop to save gas fees.
         // for (uint i = 0; i < proposalsArray.length; i++) {
         //     require(keccak256(abi.encodePacked(proposalsArray[i].description)) != keccak256(abi.encodePacked(_desc)),"The provided proposition has already been registered.");
         // }
-        require(proposalsDescriptions[_desc] == false,"The provided proposition has already been registered.");
+        require(proposalsDescriptions[_desc] == false,"The provided proposition has already been registered");
 
         Proposal memory proposal;
         proposal.description = _desc;
@@ -170,7 +170,7 @@ contract Voting is Ownable {
      */
     function startProposalsRegistering() external onlyOwner {
         require(workflowStatus == WorkflowStatus.RegisteringVoters, "Registering proposals can't be started now");
-        require(votersAddresses.length >= 1, "Impossible to start registering proposals because no voter is registered.");
+        require(votersAddresses.length >= 1, "Impossible to start registering proposals because no voter is registered");
         workflowStatus = WorkflowStatus.ProposalsRegistrationStarted;
         
         Proposal memory proposal;
@@ -186,7 +186,7 @@ contract Voting is Ownable {
      */
     function endProposalsRegistering() external onlyOwner {
         require(workflowStatus == WorkflowStatus.ProposalsRegistrationStarted, "Registering proposals has not started yet");
-        require(proposalsArray.length >= 1, "Impossible to stop proposals registration because no proposal has been registered yet.");
+        require(proposalsArray.length >= 1, "Impossible to stop proposals registration because no proposal has been registered yet");
         workflowStatus = WorkflowStatus.ProposalsRegistrationEnded;
         emit WorkflowStatusChange(WorkflowStatus.ProposalsRegistrationStarted, WorkflowStatus.ProposalsRegistrationEnded);
     }
@@ -234,13 +234,13 @@ contract Voting is Ownable {
                 }
             }
             if(winningProposalsNumber > 1) {
-                emit NoWinnerElected("Two or more proposals have the same votes count. None is elected. The vote must start over again. Try new proposals.");
+                emit NoWinnerElected("Two or more proposals have the same votes count. None is elected. The vote must start over again. Try new proposals");
             } else {
                 winnerElected = true;
                 emit WinnerElected(winningProposalID);
             }
         } else {
-            emit NoWinnerElected("None of the proposals has been choosen as the winning one. The vote must start over again. Try new proposals.");
+            emit NoWinnerElected("None of the proposals has been choosen as the winning one. The vote must start over again. Try new proposals");
         }
     }
 

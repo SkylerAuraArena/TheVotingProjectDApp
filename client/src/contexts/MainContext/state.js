@@ -62,6 +62,8 @@ const votingDeviceStates = {
   voter: {
     voterHub: "voterHub",
     getVoter: "getVoter",
+    getVotersVotes: "getVotersVotes",
+    getOneProposal: "getOneProposal",
     addProposal: "addProposal",
     setVote: "setVote",
   },
@@ -82,14 +84,16 @@ const votingScreenTextArray = {
     },
     voter: {
       welcome: "Welcome voter, select one option",
-      getVoter: "Enter the address you want to check",
+      getVoter: "Enter an address you want to check",
+      getVotersVotes: "Enter an address to check the linked vote",
       voterGotten: "The address is a registered voter",
       voterNotGotten: "The address is not a registered voter",
+      getProposal: "Enter the proposal's id you want to get information of",
       addProposal: "Desribre the proposal you wish to register",
       proposalAdded: "Proposal registration complete",
       proposalNotAdded: "Proposal registration failed, please try again",
       setVote: "Enter the proposal's id you want to vote for",
-      voteSet: "Voted !",
+      voteSet: "Voted ! (The choosen proposal has been set to the n°",
       voteNotSet: "Vote failed",
     },
   },
@@ -97,8 +101,9 @@ const votingScreenTextArray = {
 
 const ledgerScreenTextArray = {
   null: "",
+  pending: "Pending...",
   disconnected: "Connect ?",
-  connected: "Connected",
+  connected: "Logged in",
   fullfield: "Trx fullfield",
   rejected: "Trx rejected",
 }
@@ -155,6 +160,7 @@ const initialState = {
   votingDeviceScreenTxt: votingScreenTextArray.init,
   ledgerScreenTxt: ledgerScreenTextArray.disconnected,
   keyboardBtnTxt: keyboardBtnTextArray,
+  workflowStatusChangedPastEvents: [],
 };
 
 const reducer = (state, action) => {
